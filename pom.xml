@@ -152,7 +152,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.6.2</version>
+                <version>3.8.1</version>
                 <configuration>
                     <target>${java.version}</target>
                     <source>${java.version}</source>
@@ -169,48 +169,23 @@
                 </configuration>
             </plugin>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.0.0</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals><goal>copy</goal></goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>com.heroku</groupId>
-                                    <artifactId>webapp-runner</artifactId>
-                                    <version>${webapp-runner.version</version>
-                                    <destFileName>webapp-runner.jar</destFileName>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-
-            <plugin>
-                <groupId>org.codehaus.cargo</groupId>
-                <artifactId>cargo-maven2-plugin</artifactId>
-                <version>1.6.7</version>
-                <configuration>
-                    <container>
-                        <containerId>tomcat9x</containerId>
-                        <!--                        <type>embedded</type>-->
-                    </container>
-                    <configuration>
-                        <properties>
-                            <cargo.servlet.port>8081</cargo.servlet.port>
-                        </properties>
-                    </configuration>
-                </configuration>
-            </plugin>
+<!--            <plugin>-->
+<!--                <groupId>org.codehaus.cargo</groupId>-->
+<!--                <artifactId>cargo-maven2-plugin</artifactId>-->
+<!--                <version>1.6.7</version>-->
+<!--                <configuration>-->
+<!--                    <container>-->
+<!--                        <containerId>tomcat9x</containerId>-->
+<!--                        &lt;!&ndash;                        <type>embedded</type>&ndash;&gt;-->
+<!--                    </container>-->
+<!--                    <configuration>-->
+<!--                        <properties>-->
+<!--                            <cargo.servlet.port>8081</cargo.servlet.port>-->
+<!--                        </properties>-->
+<!--                    </configuration>-->
+<!--                </configuration>-->
+<!--            </plugin>-->
         </plugins>
     </build>
-
-
 
 </project>
