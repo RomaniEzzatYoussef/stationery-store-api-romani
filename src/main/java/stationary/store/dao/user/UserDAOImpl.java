@@ -35,13 +35,13 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
-    public void saveUser(User theUser) {
-
-        // get current hibernate session
+    public void saveUser(User user) {
         Session currentSession = sessionFactory.getCurrentSession();
+        for (int i = 0; i < user.getAddresses().size(); i++) {
+            user.getAddresses().get(i).setUser(user);
+        }
+        currentSession.saveOrUpdate(user);
 
-        // save/upate the User ... finally LOL
-        currentSession.saveOrUpdate(theUser);
 
     }
 
@@ -64,8 +64,8 @@ public class UserDAOImpl implements UserDAO {
         Session currentSession = sessionFactory.getCurrentSession();
 
         // delete object with primary key
-        Query theQuery =
-                currentSession.createQuery("delete from User where id=:userId");
+        Query theQuery = currentSession.createQuery("delete from User where id=:userId");
+
         theQuery.setParameter("userId", theId);
 
         theQuery.executeUpdate();

@@ -1,5 +1,6 @@
 package stationary.store.service.classifiedProduct;
 
+import org.springframework.web.bind.annotation.RequestParam;
 import stationary.store.model.ClassifiedProduct;
 import stationary.store.utilities.json.GradeProductsJSON;
 
@@ -10,7 +11,7 @@ public interface ClassifiedProductService {
 
     List<ClassifiedProduct> getClassifiedProducts();
 
-    List<GradeProductsJSON> getGradeProducts(int id);
+    List<GradeProductsJSON> getGradeProducts(int id, Integer limit);
 
     void saveClassifiedProduct(ClassifiedProduct theClassifiedProduct);
 

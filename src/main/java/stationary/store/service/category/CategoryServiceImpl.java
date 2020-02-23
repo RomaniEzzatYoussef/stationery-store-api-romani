@@ -9,6 +9,7 @@ import stationary.store.model.Product;
 import stationary.store.utilities.json.ProductsInCategoryJSON;
 
 import java.util.List;
+import java.util.Map;
 
 
 @Service
@@ -26,8 +27,20 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public List<ProductsInCategoryJSON> getCategoryProducts(int id) {
-        return categoryDAO.getCategoryProducts(id);
+    public List<ProductsInCategoryJSON> getCategoryProducts(int id,  Integer limit) {
+        return categoryDAO.getCategoryProducts(id , limit);
+    }
+
+    @Override
+    @Transactional
+    public Map<Category, Product> search(String search, Integer limit) {
+        return categoryDAO.search(search, limit);
+    }
+
+    @Override
+    @Transactional
+    public List<Product> getCategoryProductsList(int id, Integer limit) {
+        return categoryDAO.getCategoryProductsList(id , limit);
     }
 
     @Override

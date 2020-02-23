@@ -11,6 +11,8 @@ public interface ProductService {
 
     List<Product> getBestSellers(int limit);
 
+    List<Product> getAllBestSellers();
+
     void saveProduct(Product theProduct);
 
     Product getProduct(int theId);

@@ -28,6 +28,11 @@ public class ProductServiceImpl implements ProductService {
         return productDAO.getBestSellers(limit);
     }
 
+    @Override
+    @Transactional
+    public List<Product> getAllBestSellers() {
+        return productDAO.getAllBestSellers();
+    }
 
 
     @Override

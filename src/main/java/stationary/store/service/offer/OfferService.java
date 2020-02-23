@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface OfferService {
 
-    List<Offer> getOffers();
+    List<Offer> getOffers(Integer limit);
 
     List<OfferJSON> getAllOffers();
 

@@ -25,8 +25,8 @@ public class ClassifiedProductServiceImpl implements ClassifiedProductService {
 
     @Override
     @Transactional
-    public List<GradeProductsJSON> getGradeProducts(int id) {
-        return classifiedProductDAO.getGradeProducts(id);
+    public List<GradeProductsJSON> getGradeProducts(int id , Integer limit) {
+        return classifiedProductDAO.getGradeProducts(id, limit);
     }
 
     @Override

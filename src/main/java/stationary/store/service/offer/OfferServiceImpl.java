@@ -19,8 +19,8 @@ public class OfferServiceImpl implements OfferService {
 
     @Override
     @Transactional
-    public List<Offer> getOffers() {
-        return offerDAO.getOffers();
+    public List<Offer> getOffers(Integer limit) {
+        return offerDAO.getOffers(limit);
     }
 
     @Override

@@ -10,6 +10,8 @@ public interface ProductDAO {
 
     List<Product> getBestSellers(int limit);
 
+    List<Product> getAllBestSellers();
+
     void saveProduct(Product Product);
 
     Product getProduct(int id);

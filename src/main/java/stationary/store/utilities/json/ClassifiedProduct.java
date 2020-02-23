@@ -6,13 +6,13 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ClassifiedProductJSON {
+public class ClassifiedProduct {
     private int classifiedProductId;
     private int quantity;
     private int gradeId;
-    private ProductJSON productJSON;
+    private Product product;
 
-    public ClassifiedProductJSON() {
+    public ClassifiedProduct() {
     }
 
     public int getClassifiedProductId() {
@@ -39,11 +39,11 @@ public class ClassifiedProductJSON {
         this.gradeId = gradeId;
     }
 
-    public ProductJSON getProductJSON() {
-        return productJSON;
+    public Product getProduct() {
+        return product;
     }
 
-    public void setProductJSON(ProductJSON productJSON) {
-        this.productJSON = productJSON;
+    public void setProduct(Product product) {
+        this.product = product;
     }
 }

@@ -16,6 +16,7 @@
     <a href="${pageContext.request.contextPath}/api/grade/levels">Get All Grade Levels</a><br>
     <a href="${pageContext.request.contextPath}/api/grade/level/2">Get Grades By Grade Level</a><br>
     <a href="${pageContext.request.contextPath}/api/grade/2/products">Get Products By Grade</a><br>
+    <a href="${pageContext.request.contextPath}/api/search/">Search By Product Name Or Category Name</a><br>
 </div>
 
 </body>

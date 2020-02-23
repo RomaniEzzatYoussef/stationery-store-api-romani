@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface OfferDAO {
 
-    List<Offer> getOffers();
+    List<Offer> getOffers(Integer limit);
 
     List<OfferJSON> getAllOffers();
 

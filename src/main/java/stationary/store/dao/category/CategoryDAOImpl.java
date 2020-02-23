@@ -1,25 +1,34 @@
 package stationary.store.dao.category;
 
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projection;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import stationary.store.dao.category.CategoryDAO;
 import stationary.store.model.Category;
-import stationary.store.model.Offer;
-import stationary.store.model.Product;
-import stationary.store.utilities.json.ProductJSON;
+import stationary.store.utilities.exceptions.NotFoundException;
+import stationary.store.utilities.json.Product;
 import stationary.store.utilities.json.ProductsInCategoryJSON;
 
-import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public class CategoryDAOImpl implements CategoryDAO {
 
-    // need to inject the session factory
+    private int paginatedCount = 0;
+    private int paginatedSearchCount = 0;
+
     @Autowired
     private SessionFactory sessionFactory;
 
@@ -97,41 +106,136 @@ public class CategoryDAOImpl implements CategoryDAO {
     }
 
     @Override
-    public List<ProductsInCategoryJSON> getCategoryProducts(int id) {
+    public List<ProductsInCategoryJSON> getCategoryProducts(int id,  Integer limit) {
         Session currentSession = sessionFactory.getCurrentSession();
 
-        Category category = currentSession.get(Category.class, id);
+        Query<stationary.store.model.Product> productQuery = currentSession.createQuery("select p from Product p where p.category.id=:categoryId", stationary.store.model.Product.class);
+        productQuery.setParameter("categoryId" , id);
+        productQuery.setFirstResult(paginatedCount);
+        productQuery.setMaxResults(limit);
+        List<stationary.store.model.Product> products = productQuery.getResultList();
+
+        paginatedCount += limit;
+
+        int size = (products.size() / limit) + 1;
+
+        if(size == 1) {
+            paginatedCount = 0;
+        }
+
+        if (products.size() == 0) {
+            throw new NotFoundException("Products not found with category id: " + id);
+        }
 
         List<ProductsInCategoryJSON> productsInCategoryJSONS = new ArrayList<>();
-        for (int i = 0; i < category.getProducts().size(); i++) {
+        for (int i = 0; i < products.size(); i++) {
             ProductsInCategoryJSON productsInCategoryJSON = new ProductsInCategoryJSON();
 
-            ProductJSON productJSON = new ProductJSON();
-            productJSON.setProductId(category.getProducts().get(i).getProductId());
-            productJSON.setProductName(category.getProducts().get(i).getProductName());
-            productJSON.setDescription(category.getProducts().get(i).getDescription());
-            productJSON.setMinStock(category.getProducts().get(i).getMinStock());
+            Product product = new Product();
+            product.setProductId(products.get(i).getProductId());
+            product.setProductName(products.get(i).getProductName());
+            product.setDescription(products.get(i).getDescription());
+            product.setMinStock(products.get(i).getMinStock());
 
-            productsInCategoryJSON.setProduct(productJSON);
+            productsInCategoryJSON.setProduct(product);
 
-            if (category.getProducts().get(i).getPatches().size() == 0)
+            if (products.get(i).getPatches().size() == 0)
             {
                 productsInCategoryJSON.setPrice(0);
             } else {
-                productsInCategoryJSON.setPrice(category.getProducts().get(i).getPatches().get(0).getSellPrice());
+                productsInCategoryJSON.setPrice(products.get(i).getPatches().get(0).getSellPrice());
             }
 
-            if (category.getProducts().get(i).getOffers().size() == 0)
+            if (products.get(i).getOffers().size() == 0)
             {
                 productsInCategoryJSON.setDiscount(0);
             } else {
-                productsInCategoryJSON.setDiscount(category.getProducts().get(i).getOffers().get(0).getDiscount());
+                productsInCategoryJSON.setDiscount(products.get(i).getOffers().get(0).getDiscount());
             }
 
             productsInCategoryJSONS.add(productsInCategoryJSON);
         }
 
         return productsInCategoryJSONS;
+    }
+
+    @Override
+    public Map<Category, stationary.store.model.Product> search(String search, Integer limit) {
+
+        Session currentSession = sessionFactory.getCurrentSession();
+
+        Query<stationary.store.model.Product> productQuery = currentSession.createQuery("select p from Product p where p.productName like :search", stationary.store.model.Product.class);
+        productQuery.setParameter("search" , "%" + search + "%");
+        productQuery.setFirstResult(paginatedSearchCount);
+        productQuery.setMaxResults(limit);
+        List<stationary.store.model.Product> products = productQuery.getResultList();
+
+        Query<Category> categoryQuery = currentSession.createQuery("select c from Category c where c.name like :search", Category.class);
+        productQuery.setParameter("search" , "%" + search + "%");
+        productQuery.setFirstResult(paginatedSearchCount);
+        productQuery.setMaxResults(limit);
+        List<Category> categories = categoryQuery.getResultList();
+
+        Map<Category, stationary.store.model.Product> categoryProductMap = null;
+
+        if (products.size() > categories.size()){
+            paginatedSearchCount += limit;
+
+            int size = (products.size() / limit) + 1;
+
+            if(size == 1) {
+                paginatedSearchCount = 0;
+            }
+
+            for (int i = 0; i < products.size(); i++) {
+                categoryProductMap.put(categories.get(i), products.get(i));
+            }
+        } else {
+
+            paginatedSearchCount += limit;
+
+            int size = (categories.size() / limit) + 1;
+
+            if(size == 1) {
+                paginatedSearchCount = 0;
+            }
+
+            for (int i = 0; i < categories.size(); i++) {
+                categoryProductMap.put(categories.get(i), products.get(i));
+            }
+        }
+
+        if (products.size() == 0 && categories.size() == 0) {
+            throw new NotFoundException("there is no products or categories with: " + search);
+        }
+
+        return categoryProductMap;
+    }
+
+    @Override
+    public List<stationary.store.model.Product> getCategoryProductsList(int id , Integer limit) {
+        Session currentSession = sessionFactory.getCurrentSession();
+
+//        CriteriaBuilder builder = currentSession.getCriteriaBuilder();
+//        CriteriaQuery<stationary.store.model.Product> criteriaQuery = builder.createQuery(stationary.store.model.Product.class);
+//        Root<stationary.store.model.Product> root = criteriaQuery.from(stationary.store.model.Product.class);
+//        criteriaQuery.select(root);
+//        criteriaQuery.where(builder.equal(root.get("category.id") , id));
+//        Query<stationary.store.model.Product> query = currentSession.createQuery(criteriaQuery);
+//        List<stationary.store.model.Product> products = query.getResultList();
+
+
+
+        List results = currentSession.createCriteria(stationary.store.model.Product.class , "p")
+                .createAlias("offers" , "o")
+                .createAlias("patches" , "pat")
+                .add(Restrictions.eq("category.id", id))
+                .setProjection(Projections.projectionList()
+                        .add(Projections.property("p.id") , "id")
+                        .add(Projections.property("p.productName") , "productName")
+                        .add(Projections.property("o.discount") , "discount")
+                        .add(Projections.property("pat.sellPrice") , "price")).list();
+        return results;
     }
 
 }

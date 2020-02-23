@@ -19,12 +19,24 @@ public class OfferDAOImpl implements OfferDAO {
     @Autowired
     private SessionFactory sessionFactory;
 
+    int paginatedCount = 0;
+
     @Override
-    public List<Offer> getOffers() {
+    public List<Offer> getOffers(Integer limit) {
         Session currentSession = sessionFactory.getCurrentSession();
 
         Query<Offer> offerQuery = currentSession.createQuery("select o from Offer o", Offer.class);
+        offerQuery.setFirstResult(paginatedCount);
+        offerQuery.setMaxResults(limit);
         List<Offer> offers = offerQuery.getResultList();
+
+        paginatedCount += limit;
+
+        int size = (offers.size() / limit) + 1;
+
+        if(size == 1) {
+            paginatedCount = 0;
+        }
 
         return offers;
     }
@@ -59,6 +71,8 @@ public class OfferDAOImpl implements OfferDAO {
         String queryStr = "select o from Offer o";
         TypedQuery<Offer> query = currentSession.createQuery(queryStr, Offer.class);
         List<Offer> offers = query.getResultList();
+
+
 
         List<OfferJSON> offerJSONS = new ArrayList<>();
         for (int i = 0; i < offers.size(); i++) {
