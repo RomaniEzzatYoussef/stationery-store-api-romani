@@ -1,18 +1,21 @@
 package stationary.store.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.List;
 import java.util.Set;
 
 
 @Entity
 @Table(name = "user")
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class User implements Serializable {
 
     @Id
@@ -20,16 +23,16 @@ public class User implements Serializable {
     @Column(name = "id")
     private int id;
 
-    @ManyToOne(fetch = FetchType.LAZY,
-            cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "user_type_id")
+//    @JsonBackReference
     private UserType userType;
 
     @Column(name = "first_name")
     private String firstName;
 
     @Column(name = "last_name")
-    private String lastName;
+    private String last_name;
 
     @Column(name = "phone_number1")
     private String phoneNumber1;
@@ -44,10 +47,13 @@ public class User implements Serializable {
     private String password;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Address> addresses;
+    @JsonManagedReference
+    @Fetch(FetchMode.JOIN)
+    private Set<Address> addresses;
 
     @OneToMany(mappedBy = "user",
             cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
+    @JsonManagedReference
     private Set<OrderDetails> ordersDetails;
 
     @OneToOne(fetch = FetchType.LAZY,
@@ -59,10 +65,10 @@ public class User implements Serializable {
 
     }
 
-    public User(String firstName, String lastName, String phoneNumber1, String phoneNumber2, String email,
+    public User(String firstName, String last_name, String phoneNumber1, String phoneNumber2, String email,
                 String password, UserType userType) {
         this.firstName = firstName;
-        this.lastName = lastName;
+        this.last_name = last_name;
         this.phoneNumber1 = phoneNumber1;
         this.phoneNumber2 = phoneNumber2;
         this.email = email;
@@ -78,12 +84,12 @@ public class User implements Serializable {
         this.firstName = firstName;
     }
 
-    public String getLastName() {
-        return lastName;
+    public String getLast_name() {
+        return last_name;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setLast_name(String last_name) {
+        this.last_name = last_name;
     }
 
     public String getPhoneNumber1() {
@@ -134,11 +140,11 @@ public class User implements Serializable {
         this.id = id;
     }
 
-    public List<Address> getAddresses() {
+    public Set<Address> getAddresses() {
         return addresses;
     }
 
-    public void setAddresses(List<Address> addresses) {
+    public void setAddresses(Set<Address> addresses) {
         this.addresses = addresses;
     }
 

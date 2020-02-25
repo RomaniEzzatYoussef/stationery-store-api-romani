@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import stationary.store.dao.product.ProductDAO;
 import stationary.store.model.Product;
+import stationary.store.utilities.json.ProductPrDisJSON;
 
 import java.util.List;
 
@@ -24,14 +25,20 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public List<Product> getBestSellers( int limit){
+    public List<Product> getProducts(Integer id, Integer limit) {
+        return productDAO.getProducts(id , limit);
+    }
+
+    @Override
+    @Transactional
+    public List<Product> getBestSellers( Integer limit){
         return productDAO.getBestSellers(limit);
     }
 
     @Override
     @Transactional
-    public List<Product> getAllBestSellers() {
-        return productDAO.getAllBestSellers();
+    public List<ProductPrDisJSON> getBestSellerProducts(Integer limit) {
+        return productDAO.getBestSellerProducts(limit);
     }
 
 
@@ -47,6 +54,12 @@ public class ProductServiceImpl implements ProductService {
     public Product getProduct(int theId) {
 
         return productDAO.getProduct(theId);
+    }
+
+    @Override
+    @Transactional
+    public ProductPrDisJSON getProductWithID(int id) {
+        return productDAO.getProductWithID(id);
     }
 
     @Override

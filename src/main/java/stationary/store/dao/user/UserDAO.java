@@ -8,9 +8,13 @@ public interface UserDAO {
 
     List<User> getUsers();
 
+    List<User> getUsers(Integer limit);
+
     void saveUser(User User);
 
     User getUser(int id);
+
+    User getCurrentUser();
 
     void deleteUser(int id);
 

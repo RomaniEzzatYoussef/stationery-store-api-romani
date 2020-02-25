@@ -1,11 +1,17 @@
 package stationary.store.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
 
 @Entity
 @Table(name = "order_status")
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class OrderStatus implements Serializable {
 
     @Id
@@ -16,7 +22,9 @@ public class OrderStatus implements Serializable {
     @Column(name = "status")
     private String status;
 
-    @OneToMany(mappedBy = "orderStatus", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
+    @OneToMany(mappedBy = "orderStatus",
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
+    @JsonManagedReference
     private List<Order> orders;
 
     public OrderStatus() {

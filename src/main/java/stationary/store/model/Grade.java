@@ -1,10 +1,9 @@
 package stationary.store.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -12,8 +11,8 @@ import java.util.List;
 
 @Entity
 @Table(name = "grade")
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class Grade implements Serializable {
 
     @Id
@@ -23,13 +22,13 @@ public class Grade implements Serializable {
 
     @OneToMany(mappedBy = "grade",
             cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
+    @JsonManagedReference
     private List<ClassifiedProduct> classifiedProducts;
 
     @ManyToOne(fetch = FetchType.LAZY,
             cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "grade_level")
-    @Fetch(FetchMode.JOIN)
-    @JsonIgnore
+    @JsonBackReference
     private GradeLevel gradeLevel;
 
     @Column(name = "grade_number")
@@ -37,6 +36,14 @@ public class Grade implements Serializable {
 
     public Grade() {
 
+    }
+
+    public List<ClassifiedProduct> getProducts() {
+        return classifiedProducts;
+    }
+
+    public void setProducts(List<ClassifiedProduct> products) {
+        this.classifiedProducts = products;
     }
 
     public int getGradeId() {
@@ -55,22 +62,6 @@ public class Grade implements Serializable {
         this.classifiedProducts = classifiedProducts;
     }
 
-    public int getGrade() {
-        return grade;
-    }
-
-    public void setGrade(int grade) {
-        this.grade = grade;
-    }
-
-    public List<ClassifiedProduct> getProducts() {
-        return classifiedProducts;
-    }
-
-    public void setProducts(List<ClassifiedProduct> products) {
-        this.classifiedProducts = products;
-    }
-
     public GradeLevel getGradeLevel() {
         return gradeLevel;
     }
@@ -79,5 +70,11 @@ public class Grade implements Serializable {
         this.gradeLevel = gradeLevel;
     }
 
+    public int getGrade() {
+        return grade;
+    }
 
+    public void setGrade(int grade) {
+        this.grade = grade;
+    }
 }

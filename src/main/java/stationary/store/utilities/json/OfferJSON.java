@@ -1,66 +1,33 @@
 package stationary.store.utilities.json;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
+import stationary.store.model.Offer;
 
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class OfferJSON {
 
-    private int offerId;
-    private int productId;
-    private String productName;
-    private String imageUrl;
-    private double discount;
+    private Offer offer;
+    private double price;
 
     public OfferJSON() {
     }
 
-    public OfferJSON(int offerId, int productId, String productName, String imageUrl, double discount) {
-        this.offerId = offerId;
-        this.productId = productId;
-        this.productName = productName;
-        this.imageUrl = imageUrl;
-        this.discount = discount;
+    public OfferJSON(Offer offer, double price) {
+        this.offer = offer;
+        this.price = price;
     }
 
-    public int getOfferId() {
-        return offerId;
+    public Offer getOffer() {
+        return offer;
     }
 
-    public void setOfferId(int offerId) {
-        this.offerId = offerId;
+    public void setOffer(Offer offer) {
+        this.offer = offer;
     }
 
-    public int getProductId() {
-        return productId;
+    public double getPrice() {
+        return price;
     }
 
-    public void setProductId(int productId) {
-        this.productId = productId;
-    }
-
-    public String getProductName() {
-        return productName;
-    }
-
-    public void setProductName(String productName) {
-        this.productName = productName;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-
-    public double getDiscount() {
-        return discount;
-    }
-
-    public void setDiscount(double discount) {
-        this.discount = discount;
+    public void setPrice(double price) {
+        this.price = price;
     }
 }

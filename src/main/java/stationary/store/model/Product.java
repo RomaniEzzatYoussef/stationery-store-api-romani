@@ -1,23 +1,26 @@
 package stationary.store.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.*;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.Where;
+import stationary.store.utilities.myUtils.Utils;
+
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @Table(name = "product")
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class Product implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private int productId;
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
@@ -32,33 +35,51 @@ public class Product implements Serializable {
     @Column(name = "min_stock")
     private int minStock;
 
+
     @OneToMany(mappedBy = "product",
             cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
-    private List<OrderItem> orders;
+    @JsonManagedReference
+    private Set<OrderItem> orders;
 
-    @OneToMany(fetch = FetchType.LAZY ,
-            mappedBy = "product",
+    @OneToMany(
             cascade = CascadeType.ALL)
+    @JoinColumn(name = "product_id")
+    @JsonManagedReference
     @Fetch(FetchMode.JOIN)
-    private List<ProductImage> imageUrl;
+    private Set<ProductImage> imageUrl;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "product", cascade = CascadeType.ALL)
-    private List<CartItem> cartItems;
+    @JsonManagedReference
+    private Set<CartItem> cartItems;
+
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "product")
-    private List<ProductPatch> patches;
+    @JsonBackReference
+    @OrderBy("dateIn")
+    @Where(clause = "quantity > 0")
+    private Set<ProductPatch> patches;
 
-    @OneToMany(fetch = FetchType.LAZY ,
-            mappedBy = "product",
-            cascade = CascadeType.ALL)
-    private List<Offer> offers;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    @JsonBackReference
+    @OrderBy("endDate desc")
+    @Where(clause = "end_date > sysdate()")
+    private Set<Offer> offers;
 
     @OneToMany(mappedBy = "product",
             cascade = CascadeType.ALL)
-    private List<ClassifiedProduct> packages;
+    @JsonManagedReference
+    private Set<ClassifiedProduct> packages;
 
     public Product() {
+    }
 
+    public int getProductId() {
+        return productId;
+    }
+
+    public void setProductId(int productId) {
+        this.productId = productId;
     }
 
     public Category getCategory() {
@@ -69,31 +90,13 @@ public class Product implements Serializable {
         this.category = category;
     }
 
-
-    public List<OrderItem> getOrders() {
-        return orders;
+    public String getProductName() {
+        return productName;
     }
 
-    public void setOrders(List<OrderItem> orders) {
-        this.orders = orders;
+    public void setProductName(String productName) {
+        this.productName = productName;
     }
-
-    public List<CartItem> getCartItems() {
-        return cartItems;
-    }
-
-    public void setCartItems(List<CartItem> cartItems) {
-        this.cartItems = cartItems;
-    }
-
-    public List<ClassifiedProduct> getPackages() {
-        return packages;
-    }
-
-    public void setPackages(List<ClassifiedProduct> packages) {
-        this.packages = packages;
-    }
-
 
     public String getDescription() {
         return description;
@@ -111,43 +114,51 @@ public class Product implements Serializable {
         this.minStock = minStock;
     }
 
-    public List<ProductPatch> getPatches() {
-        return patches;
+    public Set<OrderItem> getOrders() {
+        return orders;
     }
 
-    public void setPatches(List<ProductPatch> patches) {
-        this.patches = patches;
+    public void setOrders(Set<OrderItem> orders) {
+        this.orders = orders;
     }
 
-    public List<Offer> getOffers() {
-        return offers;
-    }
-
-    public void setOffers(List<Offer> offers) {
-        this.offers = offers;
-    }
-
-    public int getProductId() {
-        return productId;
-    }
-
-    public void setProductId(int productId) {
-        this.productId = productId;
-    }
-
-    public String getProductName() {
-        return productName;
-    }
-
-    public void setProductName(String productName) {
-        this.productName = productName;
-    }
-
-    public List<ProductImage> getImageUrl() {
+    public Set<ProductImage> getImageUrl() {
         return imageUrl;
     }
 
-    public void setImageUrl(List<ProductImage> imageUrl) {
+    public void setImageUrl(Set<ProductImage> imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public Set<CartItem> getCartItems() {
+        return cartItems;
+    }
+
+    public void setCartItems(Set<CartItem> cartItems) {
+        this.cartItems = cartItems;
+    }
+
+    public Set<ProductPatch> getPatches() {
+        return patches;
+    }
+
+    public void setPatches(Set<ProductPatch> patches) {
+        this.patches = patches;
+    }
+
+    public Set<Offer> getOffers() {
+        return offers;
+    }
+
+    public void setOffers(Set<Offer> offers) {
+        this.offers = offers;
+    }
+
+    public Set<ClassifiedProduct> getPackages() {
+        return packages;
+    }
+
+    public void setPackages(Set<ClassifiedProduct> packages) {
+        this.packages = packages;
     }
 }

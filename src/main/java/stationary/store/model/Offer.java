@@ -1,19 +1,20 @@
 package stationary.store.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.sql.Date;
+import java.util.Date;
 
 @Entity
 @Table(name = "offers")
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
+@Where(clause = "end_date > sysdate()")
 public class Offer implements Serializable {
 
     @Id
@@ -21,19 +22,17 @@ public class Offer implements Serializable {
     @Column(name = "id")
     private int offerId;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "product_id")
-    @Fetch(FetchMode.JOIN)
+    @JsonManagedReference
     private Product product;
 
     @Column(name = "discount")
     private double discount;
 
-    @JsonIgnore
     @Column(name = "start_date")
     private Date startDate;
 
-    @JsonIgnore
     @Column(name = "end_date")
     private Date endDate;
 
@@ -41,6 +40,21 @@ public class Offer implements Serializable {
 
     }
 
+    public int getOfferId() {
+        return offerId;
+    }
+
+    public void setOfferId(int offerId) {
+        this.offerId = offerId;
+    }
+
+    public Product getProduct() {
+        return product;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
+    }
 
     public double getDiscount() {
         return discount;
@@ -65,22 +79,4 @@ public class Offer implements Serializable {
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
     }
-
-
-    public int getOfferId() {
-        return offerId;
-    }
-
-    public void setOfferId(int offerId) {
-        this.offerId = offerId;
-    }
-
-    public Product getProduct() {
-        return product;
-    }
-
-    public void setProduct(Product product) {
-        this.product = product;
-    }
-
 }

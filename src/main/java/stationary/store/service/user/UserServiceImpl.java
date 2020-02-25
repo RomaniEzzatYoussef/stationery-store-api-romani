@@ -24,6 +24,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
+    public List<User> getUsers(Integer limit) {
+        return userDAO.getUsers(limit);
+    }
+
+    @Override
+    @Transactional
     public void saveUser(User theUser) {
 
         userDAO.saveUser(theUser);
@@ -38,8 +44,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void deleteUser(int theId) {
+    public User getCurrentUser() {
+        return userDAO.getCurrentUser();
+    }
 
+    @Override
+    @Transactional
+    public void deleteUser(int theId) {
         userDAO.deleteUser(theId);
     }
 }

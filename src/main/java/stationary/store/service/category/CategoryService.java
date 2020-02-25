@@ -1,24 +1,28 @@
 package stationary.store.service.category;
 
 import stationary.store.model.Category;
-import stationary.store.model.Product;
-import stationary.store.utilities.json.ProductsInCategoryJSON;
+import stationary.store.utilities.json.Counter;
+import stationary.store.utilities.json.ProductPrDisJSON;
+import stationary.store.utilities.json.SearchCounter;
+import stationary.store.utilities.json.SearchJSON;
 
 import java.util.List;
-import java.util.Map;
-
 
 public interface CategoryService {
 
     List<Category> getCategories();
 
-    List<ProductsInCategoryJSON> getCategoryProducts(int id, Integer limit);
+    Counter getCategoryCount();
 
-    Map<Category , Product> search(String search, Integer limit);
+    List<Category> getCategories(Integer limit, Integer pageNumber);
 
-    List<Product> getCategoryProductsList(int id, Integer limit);
+    Counter getCategoryProductsCount(int id);
 
-    List<Category> getCategories(int limit);
+    List<ProductPrDisJSON> getCategoryProducts(int id, Integer limit, Integer pageNumber);
+
+    SearchJSON search(String keyWord, Integer limit, Integer pageNumber);
+
+    SearchCounter getSearchCount(String keyWord);
 
     void saveCategory(Category theCategory);
 

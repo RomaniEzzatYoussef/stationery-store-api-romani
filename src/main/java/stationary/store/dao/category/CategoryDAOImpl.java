@@ -1,64 +1,123 @@
 package stationary.store.dao.category;
 
-import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Projection;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import stationary.store.model.Category;
+import stationary.store.model.Offer;
+import stationary.store.model.Product;
+import stationary.store.model.ProductPatch;
 import stationary.store.utilities.exceptions.NotFoundException;
-import stationary.store.utilities.json.Product;
-import stationary.store.utilities.json.ProductsInCategoryJSON;
+import stationary.store.utilities.json.Counter;
+import stationary.store.utilities.json.ProductPrDisJSON;
+import stationary.store.utilities.json.SearchCounter;
+import stationary.store.utilities.json.SearchJSON;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 @Repository
 public class CategoryDAOImpl implements CategoryDAO {
-
-    private int paginatedCount = 0;
-    private int paginatedSearchCount = 0;
 
     @Autowired
     private SessionFactory sessionFactory;
 
     @Override
-    public List<Category> getCategories(Integer limit) {
+    public List<Category> getCategories(Integer limit, Integer pageNumber) {
 
-        // get the current hibernate session
         Session currentSession = sessionFactory.getCurrentSession();
 
-        // create a query  ... sort by last name
-        Query<Category> theQuery =
-                currentSession.createQuery("from Category",
-                        Category.class).setMaxResults(limit);
+        int paginateCount = 0;
+        for (int i = 1; i < pageNumber; i++) {
+            paginateCount += limit;
+        }
 
-        // execute query and get result list
-        List<Category> Categories = theQuery.getResultList();
+        Query<Category> categoryQuery = currentSession.createQuery("select c from Category c", Category.class);
+        categoryQuery.setFirstResult(paginateCount);
+        categoryQuery.setMaxResults(limit);
+        List<Category> categories = categoryQuery.getResultList();
 
-        // return the results
-        return Categories;
+        if (categories.size() == 0) {
+            throw new NotFoundException("No categories found in page: " + pageNumber);
+        }
+
+        return categories;
+    }
+
+    @Override
+    public Counter getCategoryCount() {
+        Session currentSession = sessionFactory.getCurrentSession();
+
+        Query countQuery = currentSession.createQuery("Select count (c.id) from Category c");
+        return new Counter((Long) countQuery.uniqueResult()) ;
+    }
+
+    @Override
+    public Counter getCategoryProductsCount(int id) {
+        Session currentSession = sessionFactory.getCurrentSession();
+
+        Query countQuery = currentSession.createQuery("select count (p.productId) from Product p where p.category.id=:categoryId");
+        countQuery.setParameter("categoryId" , id);
+        return new Counter((Long) countQuery.uniqueResult()) ;
+    }
+
+    @Override
+    public List<ProductPrDisJSON> getCategoryProducts(int id, Integer limit, Integer pageNumber) {
+
+        Session currentSession = sessionFactory.getCurrentSession();
+
+        int paginateCount = 0;
+        for (int i = 1; i < pageNumber; i++) {
+            paginateCount += limit;
+        }
+
+        Query<Product> productQuery = currentSession.createQuery("select p from Product p where p.category.id=:categoryId", Product.class);
+        productQuery.setParameter("categoryId" , id);
+        productQuery.setFirstResult(paginateCount);
+        productQuery.setMaxResults(limit);
+        List<Product> products = productQuery.getResultList();
+
+        if (products.size() == 0) {
+            throw new NotFoundException("Products not found with category id: " + id);
+        }
+
+        List<ProductPrDisJSON> productPrDisJSONS = new ArrayList<>();
+
+        for (int i = 0; i < products.size(); i++) {
+            ProductPrDisJSON productPrDisJSON = new ProductPrDisJSON();
+            productPrDisJSON.setProduct(products.get(i));
+
+            List<ProductPatch> productPatches = new ArrayList<>(products.get(i).getPatches());
+            if (productPatches.size() == 0)
+            {
+                productPrDisJSON.setPrice(0);
+            } else {
+                productPrDisJSON.setPrice(productPatches.get(0).getSellPrice());
+            }
+
+            List<Offer> offers = new ArrayList<>(products.get(i).getOffers());
+            if (offers.size() == 0)
+            {
+                productPrDisJSON.setDiscount(0);
+            } else {
+                productPrDisJSON.setDiscount(offers.get(0).getDiscount());
+            }
+
+            productPrDisJSONS.add(productPrDisJSON);
+        }
+
+        return productPrDisJSONS;
     }
 
     @Override
     public List<Category> getCategories() {
-
-        // get the current hibernate session
         Session currentSession = sessionFactory.getCurrentSession();
 
         // create a query  ... sort by last name
         Query<Category> theQuery =
-                currentSession.createQuery("from Category",
+                currentSession.createQuery("select c from Category c",
                         Category.class);
 
         // execute query and get result list
@@ -105,138 +164,67 @@ public class CategoryDAOImpl implements CategoryDAO {
         theQuery.executeUpdate();
     }
 
+
     @Override
-    public List<ProductsInCategoryJSON> getCategoryProducts(int id,  Integer limit) {
+    public SearchCounter getSearchCount(String keyWord) {
         Session currentSession = sessionFactory.getCurrentSession();
 
-        Query<stationary.store.model.Product> productQuery = currentSession.createQuery("select p from Product p where p.category.id=:categoryId", stationary.store.model.Product.class);
-        productQuery.setParameter("categoryId" , id);
-        productQuery.setFirstResult(paginatedCount);
-        productQuery.setMaxResults(limit);
-        List<stationary.store.model.Product> products = productQuery.getResultList();
+        Query countProductQuery = currentSession.createQuery("select count (p.productId) from Product p where p.productName like:keyWord");
+        countProductQuery.setParameter("keyWord" , "%"+keyWord+"%");
+        long productCount = (Long) countProductQuery.uniqueResult();
 
-        paginatedCount += limit;
+        Query countCategoryQuery = currentSession.createQuery("select count (c.id) from Category c where c.name like :keyWord");
+        countCategoryQuery.setParameter("keyWord" , "%"+keyWord+"%");
+        long categoryCount = (Long) countCategoryQuery.uniqueResult();
 
-        int size = (products.size() / limit) + 1;
-
-        if(size == 1) {
-            paginatedCount = 0;
-        }
-
-        if (products.size() == 0) {
-            throw new NotFoundException("Products not found with category id: " + id);
-        }
-
-        List<ProductsInCategoryJSON> productsInCategoryJSONS = new ArrayList<>();
-        for (int i = 0; i < products.size(); i++) {
-            ProductsInCategoryJSON productsInCategoryJSON = new ProductsInCategoryJSON();
-
-            Product product = new Product();
-            product.setProductId(products.get(i).getProductId());
-            product.setProductName(products.get(i).getProductName());
-            product.setDescription(products.get(i).getDescription());
-            product.setMinStock(products.get(i).getMinStock());
-
-            productsInCategoryJSON.setProduct(product);
-
-            if (products.get(i).getPatches().size() == 0)
-            {
-                productsInCategoryJSON.setPrice(0);
-            } else {
-                productsInCategoryJSON.setPrice(products.get(i).getPatches().get(0).getSellPrice());
-            }
-
-            if (products.get(i).getOffers().size() == 0)
-            {
-                productsInCategoryJSON.setDiscount(0);
-            } else {
-                productsInCategoryJSON.setDiscount(products.get(i).getOffers().get(0).getDiscount());
-            }
-
-            productsInCategoryJSONS.add(productsInCategoryJSON);
-        }
-
-        return productsInCategoryJSONS;
+        return new SearchCounter(categoryCount, productCount) ;
     }
 
-    @Override
-    public Map<Category, stationary.store.model.Product> search(String search, Integer limit) {
 
+
+    @Override
+    public SearchJSON search(String keyWord, Integer limit, Integer pageNumber) {
         Session currentSession = sessionFactory.getCurrentSession();
 
-        Query<stationary.store.model.Product> productQuery = currentSession.createQuery("select p from Product p where p.productName like :search", stationary.store.model.Product.class);
-        productQuery.setParameter("search" , "%" + search + "%");
-        productQuery.setFirstResult(paginatedSearchCount);
-        productQuery.setMaxResults(limit);
-        List<stationary.store.model.Product> products = productQuery.getResultList();
+        int productPaginateCount = 0;
+        for (int i = 1; i < pageNumber; i++) {
+            productPaginateCount += limit;
+        }
 
-        Query<Category> categoryQuery = currentSession.createQuery("select c from Category c where c.name like :search", Category.class);
-        productQuery.setParameter("search" , "%" + search + "%");
-        productQuery.setFirstResult(paginatedSearchCount);
+        Query<Product> productQuery = currentSession.createQuery("select p from Product p where p.productName like:keyWord", Product.class);
+        productQuery.setParameter("keyWord" , "%"+keyWord+"%");
+        productQuery.setFirstResult(productPaginateCount);
         productQuery.setMaxResults(limit);
+        List<Product> products = productQuery.getResultList();
+
+
+        int categoryPaginateCount = 0;
+        for (int i = 1; i < pageNumber; i++) {
+            categoryPaginateCount += limit;
+        }
+
+        Query<Category>  categoryQuery = currentSession.createQuery("select c from Category c where c.name like :keyWord", Category.class);
+        categoryQuery.setParameter("keyWord" , "%"+keyWord+"%");
+        categoryQuery.setFirstResult(categoryPaginateCount);
+        categoryQuery.setMaxResults(limit);
         List<Category> categories = categoryQuery.getResultList();
 
-        Map<Category, stationary.store.model.Product> categoryProductMap = null;
+        SearchJSON searchJSON = new SearchJSON();
+        searchJSON.setCategories(categories);
+        searchJSON.setProducts(products);
 
-        if (products.size() > categories.size()){
-            paginatedSearchCount += limit;
-
-            int size = (products.size() / limit) + 1;
-
-            if(size == 1) {
-                paginatedSearchCount = 0;
-            }
-
-            for (int i = 0; i < products.size(); i++) {
-                categoryProductMap.put(categories.get(i), products.get(i));
-            }
-        } else {
-
-            paginatedSearchCount += limit;
-
-            int size = (categories.size() / limit) + 1;
-
-            if(size == 1) {
-                paginatedSearchCount = 0;
-            }
-
-            for (int i = 0; i < categories.size(); i++) {
-                categoryProductMap.put(categories.get(i), products.get(i));
-            }
-        }
-
-        if (products.size() == 0 && categories.size() == 0) {
-            throw new NotFoundException("there is no products or categories with: " + search);
-        }
-
-        return categoryProductMap;
-    }
-
-    @Override
-    public List<stationary.store.model.Product> getCategoryProductsList(int id , Integer limit) {
-        Session currentSession = sessionFactory.getCurrentSession();
-
-//        CriteriaBuilder builder = currentSession.getCriteriaBuilder();
-//        CriteriaQuery<stationary.store.model.Product> criteriaQuery = builder.createQuery(stationary.store.model.Product.class);
-//        Root<stationary.store.model.Product> root = criteriaQuery.from(stationary.store.model.Product.class);
-//        criteriaQuery.select(root);
-//        criteriaQuery.where(builder.equal(root.get("category.id") , id));
-//        Query<stationary.store.model.Product> query = currentSession.createQuery(criteriaQuery);
-//        List<stationary.store.model.Product> products = query.getResultList();
-
-
-
-        List results = currentSession.createCriteria(stationary.store.model.Product.class , "p")
-                .createAlias("offers" , "o")
-                .createAlias("patches" , "pat")
-                .add(Restrictions.eq("category.id", id))
-                .setProjection(Projections.projectionList()
-                        .add(Projections.property("p.id") , "id")
-                        .add(Projections.property("p.productName") , "productName")
-                        .add(Projections.property("o.discount") , "discount")
-                        .add(Projections.property("pat.sellPrice") , "price")).list();
-        return results;
+        return searchJSON;
     }
 
 }
+
+
+
+
+
+
+
+
+
+
 

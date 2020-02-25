@@ -5,13 +5,12 @@ import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import stationary.store.dao.offer.OfferDAO;
 import stationary.store.model.Offer;
+import stationary.store.model.ProductPatch;
+import stationary.store.utilities.exceptions.NotFoundException;
+import stationary.store.utilities.json.Counter;
 import stationary.store.utilities.json.OfferJSON;
-
-import javax.persistence.TypedQuery;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Repository
 public class OfferDAOImpl implements OfferDAO {
@@ -19,27 +18,65 @@ public class OfferDAOImpl implements OfferDAO {
     @Autowired
     private SessionFactory sessionFactory;
 
-    int paginatedCount = 0;
-
     @Override
-    public List<Offer> getOffers(Integer limit) {
+    public List<Offer> getOffers() {
         Session currentSession = sessionFactory.getCurrentSession();
 
         Query<Offer> offerQuery = currentSession.createQuery("select o from Offer o", Offer.class);
-        offerQuery.setFirstResult(paginatedCount);
-        offerQuery.setMaxResults(limit);
+
         List<Offer> offers = offerQuery.getResultList();
-
-        paginatedCount += limit;
-
-        int size = (offers.size() / limit) + 1;
-
-        if(size == 1) {
-            paginatedCount = 0;
-        }
 
         return offers;
     }
+
+    @Override
+    public Counter getOfferCount() {
+        Session currentSession = sessionFactory.getCurrentSession();
+
+        Query countQuery = currentSession.createQuery("select count (o.offerId) from Offer o");
+        return new Counter((Long) countQuery.uniqueResult()) ;
+    }
+
+    @Override
+    public List<OfferJSON> getOffers(Integer limit , Integer pageNumber) {
+        Session currentSession = sessionFactory.getCurrentSession();
+
+        int paginateCount = 0;
+        for (int i = 1; i < pageNumber; i++) {
+            paginateCount += limit;
+        }
+
+        Query<Offer> offerQuery = currentSession.createQuery("select o from Offer o ", Offer.class);
+        offerQuery.setFirstResult(paginateCount);
+        offerQuery.setMaxResults(limit);
+        List<Offer> offers = offerQuery.getResultList();
+
+        if (offers.size() == 0) {
+            throw new NotFoundException("No offers found in page: " + pageNumber);
+        }
+
+
+        List<OfferJSON> offerJSONS = new ArrayList<>();
+
+        for (int i = 0; i < offers.size(); i++) {
+            OfferJSON offerJSON = new OfferJSON();
+
+            offerJSON.setOffer(offers.get(i));
+            List<ProductPatch> productPatches = new ArrayList<>( offers.get(i).getProduct().getPatches());
+            if (productPatches.size() == 0)
+            {
+                offerJSON.setPrice(0);
+            } else {
+                offerJSON.setPrice(productPatches.get(0).getSellPrice());
+            }
+
+            offerJSONS.add(offerJSON);
+        }
+
+        return offerJSONS;
+    }
+
+
 
     @Override
     public void saveOffer(Offer offer) {
@@ -63,41 +100,6 @@ public class OfferDAOImpl implements OfferDAO {
 
         query.executeUpdate();
     }
-
-    @Override
-    public List<OfferJSON> getAllOffers() {
-        Session currentSession = sessionFactory.getCurrentSession();
-
-        String queryStr = "select o from Offer o";
-        TypedQuery<Offer> query = currentSession.createQuery(queryStr, Offer.class);
-        List<Offer> offers = query.getResultList();
-
-
-
-        List<OfferJSON> offerJSONS = new ArrayList<>();
-        for (int i = 0; i < offers.size(); i++) {
-            OfferJSON offerJSON = new OfferJSON();
-
-            offerJSON.setOfferId(offers.get(i).getOfferId());
-            offerJSON.setProductId(offers.get(i).getProduct().getProductId());
-            offerJSON.setProductName(offers.get(i).getProduct().getProductName());
-
-            if (offers.get(i).getProduct().getImageUrl().size() == 0)
-            {
-                offerJSON.setImageUrl(null);
-            } else {
-                offerJSON.setImageUrl(offers.get(i).getProduct().getImageUrl().get(0).getImageUrl());
-            }
-
-            offerJSON.setDiscount(offers.get(i).getDiscount());
-
-            offerJSONS.add(offerJSON);
-        }
-
-
-        return offerJSONS;
-    }
-
 }
 
 

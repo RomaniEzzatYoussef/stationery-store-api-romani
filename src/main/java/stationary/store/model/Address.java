@@ -1,6 +1,6 @@
 package stationary.store.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -9,8 +9,8 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "address")
+@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-@JsonIgnoreProperties(ignoreUnknown = true , value = {"user"})
 public class Address implements Serializable {
 
     @Id
@@ -38,6 +38,7 @@ public class Address implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "user_id")
+    @JsonBackReference
     private User user;
 
     public Address() {

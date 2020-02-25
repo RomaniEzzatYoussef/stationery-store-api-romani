@@ -25,12 +25,6 @@ public class ClassifiedProductServiceImpl implements ClassifiedProductService {
 
     @Override
     @Transactional
-    public List<GradeProductsJSON> getGradeProducts(int id , Integer limit) {
-        return classifiedProductDAO.getGradeProducts(id, limit);
-    }
-
-    @Override
-    @Transactional
     public void saveClassifiedProduct(ClassifiedProduct theClassifiedProduct) {
 
         classifiedProductDAO.saveClassifiedProduct(theClassifiedProduct);
@@ -49,6 +43,13 @@ public class ClassifiedProductServiceImpl implements ClassifiedProductService {
 
         classifiedProductDAO.deleteClassifiedProduct(theId);
     }
+
+    @Override
+    @Transactional
+    public List<GradeProductsJSON> getGradeProducts(int id , Integer limit) {
+        return classifiedProductDAO.getGradeProducts(id, limit);
+    }
+
 }
 
 

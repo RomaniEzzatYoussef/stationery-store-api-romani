@@ -2,17 +2,18 @@ package stationary.store.utilities.json;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import stationary.store.model.Product;
 
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ProductsInCategoryJSON {
+public class ProductPrDisJSON {
 
     private Product product;
     private double discount;
     private double price;
 
-    public ProductsInCategoryJSON() {
+    public ProductPrDisJSON() {
     }
 
     public Product getProduct() {

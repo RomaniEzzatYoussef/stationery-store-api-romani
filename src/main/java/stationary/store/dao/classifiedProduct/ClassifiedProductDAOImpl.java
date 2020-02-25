@@ -5,10 +5,11 @@ import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.bind.annotation.RequestParam;
-import stationary.store.utilities.json.ClassifiedProduct;
+import stationary.store.model.ClassifiedProduct;
+import stationary.store.model.Offer;
+import stationary.store.model.Product;
+import stationary.store.model.ProductPatch;
 import stationary.store.utilities.json.GradeProductsJSON;
-import stationary.store.utilities.json.Product;
 
 import javax.persistence.TypedQuery;
 import java.util.ArrayList;
@@ -17,34 +18,30 @@ import java.util.List;
 @Repository
 public class ClassifiedProductDAOImpl implements ClassifiedProductDAO {
 
-    // need to inject the session factory
+
     @Autowired
     private SessionFactory sessionFactory;
 
-    int paginatedCount = 0;
-
     @Override
-    public List<stationary.store.model.ClassifiedProduct> getClassifiedProducts() {
+    public List<ClassifiedProduct> getClassifiedProducts() {
 
         // get the current hibernate session
         Session currentSession = sessionFactory.getCurrentSession();
 
         // create a query  ... sort by last name
-        Query<stationary.store.model.ClassifiedProduct> theQuery =
+        Query<ClassifiedProduct> theQuery =
                 currentSession.createQuery("from ClassifiedProduct",
-                        stationary.store.model.ClassifiedProduct.class);
+                        ClassifiedProduct.class);
 
         // execute query and get result list
-        List<stationary.store.model.ClassifiedProduct> ClassifiedProducts = theQuery.getResultList();
+        List<ClassifiedProduct> ClassifiedProducts = theQuery.getResultList();
 
         // return the results
         return ClassifiedProducts;
     }
 
-
-
     @Override
-    public void saveClassifiedProduct(stationary.store.model.ClassifiedProduct theClassifiedProduct) {
+    public void saveClassifiedProduct(ClassifiedProduct theClassifiedProduct) {
 
         // get current hibernate session
         Session currentSession = sessionFactory.getCurrentSession();
@@ -55,13 +52,13 @@ public class ClassifiedProductDAOImpl implements ClassifiedProductDAO {
     }
 
     @Override
-    public stationary.store.model.ClassifiedProduct getClassifiedProduct(int theId) {
+    public ClassifiedProduct getClassifiedProduct(int theId) {
 
         // get the current hibernate session
         Session currentSession = sessionFactory.getCurrentSession();
 
         // now retrieve/read from database using the primary key
-        stationary.store.model.ClassifiedProduct theClassifiedProduct = currentSession.get(stationary.store.model.ClassifiedProduct.class, theId);
+        ClassifiedProduct theClassifiedProduct = currentSession.get(ClassifiedProduct.class, theId);
 
         return theClassifiedProduct;
     }
@@ -80,56 +77,41 @@ public class ClassifiedProductDAOImpl implements ClassifiedProductDAO {
         theQuery.executeUpdate();
     }
 
+
     @Override
     public List<GradeProductsJSON> getGradeProducts(int id, Integer limit) {
         Session currentSession = sessionFactory.getCurrentSession();
 
         String queryStr = "select c from ClassifiedProduct c where c.grade.gradeId=:gradeId";
-        TypedQuery<stationary.store.model.ClassifiedProduct> query = currentSession.createQuery(queryStr, stationary.store.model.ClassifiedProduct.class);
+        TypedQuery<ClassifiedProduct> query = currentSession.createQuery(queryStr, stationary.store.model.ClassifiedProduct.class);
         query.setParameter("gradeId" , id);
-        query.setFirstResult(paginatedCount);
+        query.setFirstResult(0);
         query.setMaxResults(limit);
-        List<stationary.store.model.ClassifiedProduct> classifiedProducts = query.getResultList();
-
-
-        paginatedCount += limit;
-
-        int size = (classifiedProducts.size() / limit) + 1;
-
-        if(size == 1) {
-            paginatedCount = 0;
-        }
+        List<ClassifiedProduct> classifiedProducts = query.getResultList();
 
         List<GradeProductsJSON> gradeProductsJSONS = new ArrayList<>();
+
         for (int i = 0; i < classifiedProducts.size(); i++) {
             GradeProductsJSON gradeProductsJSON = new GradeProductsJSON();
 
-            ClassifiedProduct classifiedProduct = new ClassifiedProduct();
-            classifiedProduct.setClassifiedProductId(classifiedProducts.get(i).getId());
-            classifiedProduct.setGradeId(classifiedProducts.get(i).getGrade().getGradeId());
-            classifiedProduct.setQuantity(classifiedProducts.get(i).getQuantity());
+            gradeProductsJSON.setClassifiedProduct(classifiedProducts.get(i));
 
-            Product product = new Product();
-            product.setProductId(classifiedProducts.get(i).getProduct().getProductId());
-            product.setProductName(classifiedProducts.get(i).getProduct().getProductName());
-            product.setDescription(classifiedProducts.get(i).getProduct().getDescription());
-            product.setMinStock(classifiedProducts.get(i).getProduct().getMinStock());
-
-            classifiedProduct.setProduct(product);
-
-            gradeProductsJSON.setClassifiedProduct(classifiedProduct);
-
-            if (classifiedProducts.get(i).getProduct().getOffers().size() == 0) {
-                gradeProductsJSON.setDiscount(0);
-            } else {
-                gradeProductsJSON.setDiscount(classifiedProducts.get(i).getProduct().getOffers().get(0).getDiscount());
-            }
-
-            if (classifiedProducts.get(i).getProduct().getPatches().size() == 0) {
+            List<ProductPatch> productPatches = new ArrayList<>(classifiedProducts.get(i).getProduct().getPatches());
+            if (productPatches.size() == 0)
+            {
                 gradeProductsJSON.setPrice(0);
             } else {
-                gradeProductsJSON.setPrice(classifiedProducts.get(i).getProduct().getPatches().get(0).getSellPrice());
+                gradeProductsJSON.setPrice(productPatches.get(0).getSellPrice());
             }
+
+            List<Offer> offers = new ArrayList<>(classifiedProducts.get(i).getProduct().getOffers());
+            if (offers.size() == 0)
+            {
+                gradeProductsJSON.setDiscount(0);
+            } else {
+                gradeProductsJSON.setDiscount(offers.get(0).getDiscount());
+            }
+
 
             gradeProductsJSONS.add(gradeProductsJSON);
         }
@@ -138,6 +120,7 @@ public class ClassifiedProductDAOImpl implements ClassifiedProductDAO {
 
         return gradeProductsJSONS;
     }
+
 
 }
 

@@ -5,7 +5,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import stationary.store.dao.cartItem.CartItemDAO;
 import stationary.store.model.CartItem;
 
 import java.util.List;

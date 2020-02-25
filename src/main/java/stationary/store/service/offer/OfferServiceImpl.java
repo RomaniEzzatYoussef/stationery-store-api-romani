@@ -2,11 +2,12 @@ package stationary.store.service.offer;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import stationary.store.dao.offer.OfferDAO;
 import stationary.store.model.Offer;
+import stationary.store.utilities.json.Counter;
 import stationary.store.utilities.json.OfferJSON;
 
-import javax.transaction.Transactional;
 import java.util.List;
 
 
@@ -19,14 +20,20 @@ public class OfferServiceImpl implements OfferService {
 
     @Override
     @Transactional
-    public List<Offer> getOffers(Integer limit) {
-        return offerDAO.getOffers(limit);
+    public List<Offer> getOffers() {
+        return offerDAO.getOffers();
     }
 
     @Override
     @Transactional
-    public List<OfferJSON> getAllOffers() {
-        return offerDAO.getAllOffers();
+    public Counter getOfferCount() {
+        return offerDAO.getOfferCount();
+    }
+
+    @Override
+    @Transactional
+    public List<OfferJSON> getOffers(Integer limit , Integer pageNumber) {
+        return offerDAO.getOffers(limit , pageNumber);
     }
 
     @Override

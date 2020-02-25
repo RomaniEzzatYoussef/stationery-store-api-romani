@@ -5,7 +5,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import stationary.store.dao.grade.GradeDAO;
 import stationary.store.model.Grade;
 import stationary.store.utilities.exceptions.NotFoundException;
 
@@ -34,6 +33,21 @@ public class GradeDAOImpl implements GradeDAO {
 
         // return the results
         return Grades;
+    }
+
+    @Override
+    public List<Grade> getGradesByGradeLevel(int id) {
+        Session currentSession = sessionFactory.getCurrentSession();
+
+        Query<Grade> query = currentSession.createQuery("select g from Grade g where g.gradeLevel.id =:id", Grade.class);
+        query.setParameter("id" , id);
+        List<Grade> grades = query.getResultList();
+
+        if (grades.size() == 0) {
+            throw new NotFoundException("Grades not found with grade level id: " + id);
+        }
+
+        return grades;
     }
 
     @Override
@@ -72,23 +86,6 @@ public class GradeDAOImpl implements GradeDAO {
 
         theQuery.executeUpdate();
     }
-
-
-    @Override
-    public List<Grade> getGradesByGradeLevel(int id) {
-        Session currentSession = sessionFactory.getCurrentSession();
-
-        Query<Grade> query = currentSession.createQuery("select g from Grade g where g.gradeLevel.id =:id", Grade.class);
-        query.setParameter("id" , id);
-        List<Grade> grades = query.getResultList();
-
-        if (grades.size() == 0) {
-            throw new NotFoundException("Grades not found with grade level id: " + id);
-        }
-
-        return grades;
-    }
-
 
 }
 

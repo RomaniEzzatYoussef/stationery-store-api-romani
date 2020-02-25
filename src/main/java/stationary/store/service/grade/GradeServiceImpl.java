@@ -24,12 +24,6 @@ public class GradeServiceImpl implements GradeService {
 
     @Override
     @Transactional
-    public List<Grade> getGradesByGradeLevel(int id) {
-        return gradeDAO.getGradesByGradeLevel(id);
-    }
-
-    @Override
-    @Transactional
     public void saveGrade(Grade theGrade) {
 
         gradeDAO.saveGrade(theGrade);
@@ -48,6 +42,13 @@ public class GradeServiceImpl implements GradeService {
 
         gradeDAO.deleteGrade(theId);
     }
+
+    @Override
+    @Transactional
+    public List<Grade> getGradesByGradeLevel(int id) {
+        return gradeDAO.getGradesByGradeLevel(id);
+    }
+
 }
 
 
