@@ -29,7 +29,10 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.authorizeRequests().anyRequest()
                 .authenticated().and().formLogin()
-                .loginPage("/showMyLoginPage").loginProcessingUrl("/authenticateUser").permitAll();
+                .loginPage("/showMyLoginPage")
+                .loginProcessingUrl("/authenticateUser")
+                .permitAll()
+                .and().logout().permitAll();
     }
 
 }

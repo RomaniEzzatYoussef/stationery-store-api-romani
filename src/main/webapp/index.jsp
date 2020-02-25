@@ -1,3 +1,5 @@
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+
 <html>
 <body>
 
@@ -21,6 +23,13 @@
     <a href="${pageContext.request.contextPath}/api/offer/count">Offer Count</a><br>
     <a href="${pageContext.request.contextPath}/api/category/1/products/count">Category Products Count</a><br>
     <a href="${pageContext.request.contextPath}/api/search/count?keyWord=q">Search Count</a><br>
+</div>
+
+
+<div style="margin: 25px">
+    <form:form action="${pageContext.request.contextPath}/logout">
+        <input type="submit" value="Logout" />
+    </form:form>
 </div>
 
 </body>
