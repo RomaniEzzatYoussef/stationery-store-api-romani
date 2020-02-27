@@ -26,7 +26,7 @@ public class UserDAOImpl implements UserDAO {
 
         // create a query  ... sort by last name
         Query<User> theQuery =
-                currentSession.createQuery("From User", User.class);
+                currentSession.createQuery("select u From User u", User.class);
 
         // execute query and get result list
         List<User> Users = theQuery.getResultList();
@@ -83,6 +83,26 @@ public class UserDAOImpl implements UserDAO {
         }
 
         return user;
+    }
+
+    @Override
+    public User getUserByEmail(String email) {
+        Session currentSession = sessionFactory.getCurrentSession();
+        User user = currentSession.get(User.class, email);
+
+        return user;
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        Session currentSession = sessionFactory.getCurrentSession();
+        User user = currentSession.get(User.class, email);
+
+        if (user == null) {
+            return false;
+        }
+
+        return true;
     }
 
     @Override

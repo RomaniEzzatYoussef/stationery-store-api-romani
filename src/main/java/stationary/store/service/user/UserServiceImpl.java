@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import stationary.store.dao.user.UserDAO;
 import stationary.store.model.User;
-
 import java.util.List;
 
 
@@ -50,9 +49,23 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
+    public User getUserByEmail(String email) {
+        return userDAO.getUserByEmail(email);
+    }
+
+    @Override
+    @Transactional
+    public boolean existsByEmail(String email) {
+        return userDAO.existsByEmail(email);
+    }
+
+    @Override
+    @Transactional
     public void deleteUser(int theId) {
         userDAO.deleteUser(theId);
     }
+
+
 }
 
 

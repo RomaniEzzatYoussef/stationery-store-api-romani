@@ -1,5 +1,7 @@
 package stationary.store.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +10,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -18,6 +22,7 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 import javax.sql.DataSource;
 import java.beans.PropertyVetoException;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -125,6 +130,24 @@ public class AppConfig implements WebMvcConfigurer {
         viewResolver.setSuffix(".jsp");
 
         return viewResolver;
+    }
+
+    public MappingJackson2HttpMessageConverter jacksonMessageConverter() {
+        MappingJackson2HttpMessageConverter messageConverter = new MappingJackson2HttpMessageConverter();
+
+        ObjectMapper mapper = new ObjectMapper();
+        //Registering Hibernate4Module to support lazy objects
+        mapper.registerModule(new Hibernate5Module());
+
+        messageConverter.setObjectMapper(mapper);
+        return messageConverter;
+
+    }
+
+    @Override
+    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+        //Here we add our custom-configured HttpMessageConverter
+        converters.add(jacksonMessageConverter());
     }
 
 }

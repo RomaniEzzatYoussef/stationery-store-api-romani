@@ -1,4 +1,5 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ taglib prefix="security" uri="http://www.springframework.org/security/tags" %>
 
 <html>
 <body>
@@ -25,12 +26,25 @@
     <a href="${pageContext.request.contextPath}/api/search/count?keyWord=q">Search Count</a><br>
 </div>
 
+<hr>
+<hr>
 
-<div style="margin: 25px">
-    <form:form action="${pageContext.request.contextPath}/logout">
-        <input type="submit" value="Logout" />
-    </form:form>
-</div>
+<!-- display user name and role -->
+
+<%--<p>--%>
+<%--    User: <security:authentication property="principal.username" />--%>
+<%--    <br><br>--%>
+<%--    Role(s): <security:authentication property="principal.authorities" />--%>
+<%--</p>--%>
+
+<hr>
+<hr>
+<%--<div style="margin: 25px">--%>
+<%--    <form:form action="${pageContext.request.contextPath}/logout" >--%>
+<%--        <input type="submit" value="Logout" />--%>
+<%--    </form:form>--%>
+<%--</div>--%>
+<hr>
 
 </body>
 </html>

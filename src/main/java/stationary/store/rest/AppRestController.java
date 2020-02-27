@@ -2,7 +2,8 @@ package stationary.store.rest;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import stationary.store.model.*;
 import stationary.store.service.category.CategoryService;
@@ -13,12 +14,12 @@ import stationary.store.service.offer.OfferService;
 import stationary.store.service.product.ProductService;
 import stationary.store.service.user.UserService;
 import stationary.store.utilities.json.*;
-
+import javax.validation.Valid;
 import java.util.List;
 
 
 @RestController
-@CrossOrigin(maxAge = 3600)
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RequestMapping("/api")
 public class AppRestController {
 
@@ -118,12 +119,12 @@ public class AppRestController {
         return users;
     }
 
-    @PostMapping("/user")
-    public User addUser(@RequestBody User user) {
-        user.setId(0);
-        userService.saveUser(user);
-        return user;
-    }
+//    @PostMapping("/user")
+//    public User addUser(@RequestBody User user) {
+//        user.setId(0);
+//        userService.saveUser(user);
+//        return user;
+//    }
 
     @GetMapping("/user/current")
     public User getCurrentUser() {
@@ -224,11 +225,62 @@ public class AppRestController {
 
 
     // User Authentication
+//    @Autowired
+//    AuthenticationManager authenticationManager;
 
+
+//    @Autowired
+//    RoleRepository roleRepository;
+
+//    @Autowired
+//    PasswordEncoder encoder;
+//
+//    @Autowired
+//    JwtProvider jwtProvider;
+
+//    @PostMapping("/signin")
+//    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginForm loginRequest) {
+//
+//        Authentication authentication = authenticationManager.authenticate(
+//                new UsernamePasswordAuthenticationToken(
+//                        loginRequest.getUsername(),
+//                        loginRequest.getPassword()
+//                )
+//        );
+//
+//        SecurityContextHolder.getContext().setAuthentication(authentication);
+//
+//        String jwt = jwtProvider.generateJwtToken(authentication);
+//        return ResponseEntity.ok(new JwtResponse(jwt));
+//    }
+
+
+    @PostMapping("/user")
+    public ResponseEntity<String> registerUser(@Valid @RequestBody User user) {
+
+        if(userService.existsByEmail(user.getEmail())) {
+            return new ResponseEntity<String>("Fail -> Email is already in use!",
+                    HttpStatus.BAD_REQUEST);
+        }
+
+        // Creating user's account
+//        User user = signUpRequest;
+//
+        user.setId(0);
+        userService.saveUser(user);
+
+
+//        if(userRepository.existsByUsername(signUpRequest.getUsername())) {
+//            return new ResponseEntity<String>("Fail -> Username is already taken!",
+//                    HttpStatus.BAD_REQUEST);
+//        }
+
+        return ResponseEntity.ok().body("User registered successfully!");
+    }
 
 
 }
-	
+
 
 	
 

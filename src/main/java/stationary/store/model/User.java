@@ -25,7 +25,7 @@ public class User implements Serializable {
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "user_type_id")
-//    @JsonBackReference
+    @JsonBackReference
     private UserType userType;
 
     @Column(name = "first_name")

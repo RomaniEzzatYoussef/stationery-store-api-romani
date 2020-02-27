@@ -1,7 +1,6 @@
 package stationary.store.dao.user;
 
 import stationary.store.model.User;
-
 import java.util.List;
 
 public interface UserDAO {
@@ -13,6 +12,10 @@ public interface UserDAO {
     void saveUser(User User);
 
     User getUser(int id);
+
+    User getUserByEmail(String email);
+
+    boolean existsByEmail(String email);
 
     User getCurrentUser();
 
