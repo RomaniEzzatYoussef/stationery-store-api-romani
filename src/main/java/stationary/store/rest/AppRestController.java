@@ -1,10 +1,16 @@
 package stationary.store.rest;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
+import stationary.store.config.security.jwt.JwtUtil;
+import stationary.store.config.security.message.request.AuthRequest;
+import stationary.store.config.security.message.request.AuthResponse;
 import stationary.store.model.*;
 import stationary.store.service.category.CategoryService;
 import stationary.store.service.classifiedProduct.ClassifiedProductService;
@@ -14,18 +20,12 @@ import stationary.store.service.offer.OfferService;
 import stationary.store.service.product.ProductService;
 import stationary.store.service.user.UserService;
 import stationary.store.utilities.json.*;
-import javax.validation.Valid;
 import java.util.List;
-
 
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RequestMapping("/api")
 public class AppRestController {
-
-    // autowire the UserService
-    @Autowired
-    private UserService userService;
 
     @Autowired
     private ProductService productService;
@@ -107,47 +107,6 @@ public class AppRestController {
         return gradeProductsJSONS;
     }
 
-    @GetMapping("/users")
-    public List<User> getUsers(@RequestParam(required = false) Integer limit) {
-        List<User> users;
-        if (limit == null) {
-            users = userService.getUsers(5);
-        } else {
-            users = userService.getUsers(limit);
-        }
-
-        return users;
-    }
-
-//    @PostMapping("/user")
-//    public User addUser(@RequestBody User user) {
-//        user.setId(0);
-//        userService.saveUser(user);
-//        return user;
-//    }
-
-    @GetMapping("/user/current")
-    public User getCurrentUser() {
-        return  userService.getCurrentUser();
-    }
-
-    @GetMapping("/user/{id}")
-    public User getCurrentUser(@PathVariable int id) {
-        return  userService.getUser(id);
-    }
-
-    @PutMapping("/user")
-    public User updateUser(@RequestBody User user) {
-        userService.saveUser(user);
-        return user;
-    }
-
-    @PatchMapping("/user")
-    public User updateUserThat(@RequestBody User user) {
-        userService.saveUser(user);
-        return user;
-    }
-
     @GetMapping("/product/bestseller")
     public List<ProductPrDisJSON> getBestSellers(@RequestParam(required = false) Integer limit) {
         List<ProductPrDisJSON> bestSellerJSONS;
@@ -224,60 +183,32 @@ public class AppRestController {
     }
 
 
-    // User Authentication
-//    @Autowired
-//    AuthenticationManager authenticationManager;
 
 
-//    @Autowired
-//    RoleRepository roleRepository;
 
-//    @Autowired
-//    PasswordEncoder encoder;
-//
-//    @Autowired
-//    JwtProvider jwtProvider;
+    @Autowired
+    AuthenticationManager authenticationManager;
 
-//    @PostMapping("/signin")
-//    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginForm loginRequest) {
-//
-//        Authentication authentication = authenticationManager.authenticate(
-//                new UsernamePasswordAuthenticationToken(
-//                        loginRequest.getUsername(),
-//                        loginRequest.getPassword()
-//                )
-//        );
-//
-//        SecurityContextHolder.getContext().setAuthentication(authentication);
-//
-//        String jwt = jwtProvider.generateJwtToken(authentication);
-//        return ResponseEntity.ok(new JwtResponse(jwt));
-//    }
+    @Autowired
+    UserDetailsService userDetailsService;
 
+    @Autowired
+    JwtUtil JwtUtil;
 
     @PostMapping("/user")
-    public ResponseEntity<String> registerUser(@Valid @RequestBody User user) {
-
-        if(userService.existsByEmail(user.getEmail())) {
-            return new ResponseEntity<String>("Fail -> Email is already in use!",
-                    HttpStatus.BAD_REQUEST);
+    public ResponseEntity<?> registerUser(@RequestBody AuthRequest user) throws Exception {
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername() , user.getPassword()));
+        } catch (BadCredentialsException e) {
+            throw new Exception("Incorrect username or password" , e);
         }
 
-        // Creating user's account
-//        User user = signUpRequest;
-//
-        user.setId(0);
-        userService.saveUser(user);
+        final UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
 
+        final String jwt = JwtUtil.generateToken(userDetails);
 
-//        if(userRepository.existsByUsername(signUpRequest.getUsername())) {
-//            return new ResponseEntity<String>("Fail -> Username is already taken!",
-//                    HttpStatus.BAD_REQUEST);
-//        }
-
-        return ResponseEntity.ok().body("User registered successfully!");
+        return ResponseEntity.ok(new AuthResponse(jwt));
     }
-
 
 }
 

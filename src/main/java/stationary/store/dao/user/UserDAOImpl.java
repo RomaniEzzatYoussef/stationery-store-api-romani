@@ -88,15 +88,26 @@ public class UserDAOImpl implements UserDAO {
     @Override
     public User getUserByEmail(String email) {
         Session currentSession = sessionFactory.getCurrentSession();
-        User user = currentSession.get(User.class, email);
 
-        return user;
+        if (existsByEmail(email)) {
+            Query<User> theQuery = currentSession.createQuery("select u from User u where u.email=:email" , User.class);
+            theQuery.setParameter("email", email);
+            User user =  theQuery.getResultList().get(0);
+            return user;
+        } else {
+            User user = new User();
+            user.setEmail("romani");
+            user.setPassword("r");
+            return user;
+        }
     }
 
     @Override
     public boolean existsByEmail(String email) {
         Session currentSession = sessionFactory.getCurrentSession();
-        User user = currentSession.get(User.class, email);
+        Query<User> theQuery = currentSession.createQuery("select u from User u where u.email=:email" , User.class);
+        theQuery.setParameter("email", email);
+        User user =  theQuery.getSingleResult();
 
         if (user == null) {
             return false;

@@ -46,6 +46,9 @@ public class User implements Serializable {
     @Column(name = "password")
     private String password;
 
+    @Column(name = "enabled")
+    private int enabled;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonManagedReference
     @Fetch(FetchMode.JOIN)
@@ -164,5 +167,11 @@ public class User implements Serializable {
         this.cart = cart;
     }
 
+    public int getEnabled() {
+        return enabled;
+    }
 
+    public void setEnabled(int enabled) {
+        this.enabled = enabled;
+    }
 }
