@@ -5,16 +5,19 @@ import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth2Sso;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
+import org.springframework.security.oauth2.config.annotation.web.configuration.EnableOAuth2Client;
+import org.springframework.security.oauth2.provider.token.TokenStore;
+import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -30,6 +33,7 @@ import java.util.logging.Logger;
 @Configuration
 @EnableWebMvc
 @EnableTransactionManagement
+@EnableOAuth2Client
 @ComponentScan("stationary.store")
 @PropertySource({"classpath:persistence-mysql.properties"})
 public class AppConfig implements WebMvcConfigurer {
@@ -150,6 +154,7 @@ public class AppConfig implements WebMvcConfigurer {
         //Here we add our custom-configured HttpMessageConverter
         converters.add(jacksonMessageConverter());
     }
+
 
 }
 

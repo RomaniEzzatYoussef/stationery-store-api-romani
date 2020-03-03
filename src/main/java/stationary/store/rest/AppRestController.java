@@ -8,9 +8,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
-import stationary.store.config.security.jwt.JwtUtil;
-import stationary.store.config.security.message.request.AuthRequest;
-import stationary.store.config.security.message.request.AuthResponse;
+import stationary.store.config.security.MyUserDetails;
 import stationary.store.model.*;
 import stationary.store.service.category.CategoryService;
 import stationary.store.service.classifiedProduct.ClassifiedProductService;
@@ -183,32 +181,48 @@ public class AppRestController {
     }
 
 
-
-
-
     @Autowired
-    AuthenticationManager authenticationManager;
+    UserService userService;
 
     @Autowired
     UserDetailsService userDetailsService;
 
-    @Autowired
-    JwtUtil JwtUtil;
 
-    @PostMapping("/user")
-    public ResponseEntity<?> registerUser(@RequestBody AuthRequest user) throws Exception {
-        try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername() , user.getPassword()));
-        } catch (BadCredentialsException e) {
-            throw new Exception("Incorrect username or password" , e);
-        }
+//    @Autowired
+//    AuthenticationManager authenticationManager;
 
-        final UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
 
-        final String jwt = JwtUtil.generateToken(userDetails);
 
-        return ResponseEntity.ok(new AuthResponse(jwt));
-    }
+//    @Autowired
+//    JwtUtil JwtUtil;
+//
+//    @PostMapping("/user/u")
+//    public ResponseEntity<?> registerUser(@RequestBody AuthRequest user) throws Exception {
+//        try {
+//            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername() , user.getPassword()));
+//        } catch (BadCredentialsException e) {
+//            throw new Exception("Incorrect username or password" , e);
+//        }
+//
+//        final UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
+//
+//        final String jwt = JwtUtil.generateToken(userDetails);
+//
+//        return ResponseEntity.ok(new AuthResponse(jwt));
+//    }
+//
+//    @PostMapping("/user")
+//    public User registerUser(@RequestBody User user) throws Exception {
+//
+//        UserDetails userDetails = new MyUserDetails(user);
+//        final String jwt = JwtUtil.generateToken(userDetails);
+//
+//        user.setId(0);
+//        user.setToken(jwt);
+//        userService.saveUser(user);
+//
+//        return user;
+//    }
 
 }
 

@@ -6,9 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
-
 import javax.persistence.*;
-import java.io.Serializable;
 import java.util.Set;
 
 
@@ -16,7 +14,7 @@ import java.util.Set;
 @Table(name = "user")
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class User implements Serializable {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,7 +30,7 @@ public class User implements Serializable {
     private String firstName;
 
     @Column(name = "last_name")
-    private String last_name;
+    private String lastName;
 
     @Column(name = "phone_number1")
     private String phoneNumber1;
@@ -46,6 +44,9 @@ public class User implements Serializable {
     @Column(name = "password")
     private String password;
 
+    @Column(name = "token")
+    private String token;
+
     @Column(name = "enabled")
     private int enabled;
 
@@ -53,29 +54,33 @@ public class User implements Serializable {
     @JsonManagedReference
     @Fetch(FetchMode.JOIN)
     private Set<Address> addresses;
+//
+//    @OneToMany(mappedBy = "user",
+//            cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
+//    @JsonManagedReference
+//    private Set<OrderDetails> ordersDetails;
 
-    @OneToMany(mappedBy = "user",
-            cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
-    @JsonManagedReference
-    private Set<OrderDetails> ordersDetails;
-
-    @OneToOne(fetch = FetchType.LAZY,
-            cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
-    @JoinColumn(name = "cart_id")
-    private Cart cart;
+//    @OneToOne(fetch = FetchType.LAZY,
+//            cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
+//    @JoinColumn(name = "cart_id")
+//    private Cart cart;
 
     public User() {
-
     }
 
-    public User(String firstName, String last_name, String phoneNumber1, String phoneNumber2, String email,
-                String password, UserType userType) {
-        this.firstName = firstName;
-        this.last_name = last_name;
-        this.phoneNumber1 = phoneNumber1;
-        this.phoneNumber2 = phoneNumber2;
-        this.email = email;
-        this.password = password;
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public UserType getUserType() {
+        return userType;
+    }
+
+    public void setUserType(UserType userType) {
         this.userType = userType;
     }
 
@@ -87,12 +92,12 @@ public class User implements Serializable {
         this.firstName = firstName;
     }
 
-    public String getLast_name() {
-        return last_name;
+    public String getLastName() {
+        return lastName;
     }
 
-    public void setLast_name(String last_name) {
-        this.last_name = last_name;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getPhoneNumber1() {
@@ -127,44 +132,12 @@ public class User implements Serializable {
         this.password = password;
     }
 
-    public UserType getUserType() {
-        return userType;
+    public String getToken() {
+        return token;
     }
 
-    public void setUserType(UserType userType) {
-        this.userType = userType;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public Set<Address> getAddresses() {
-        return addresses;
-    }
-
-    public void setAddresses(Set<Address> addresses) {
-        this.addresses = addresses;
-    }
-
-    public Set<OrderDetails> getOrdersDetails() {
-        return ordersDetails;
-    }
-
-    public void setOrdersDetails(Set<OrderDetails> ordersDetails) {
-        this.ordersDetails = ordersDetails;
-    }
-
-    public Cart getCart() {
-        return cart;
-    }
-
-    public void setCart(Cart cart) {
-        this.cart = cart;
+    public void setToken(String token) {
+        this.token = token;
     }
 
     public int getEnabled() {
@@ -174,4 +147,28 @@ public class User implements Serializable {
     public void setEnabled(int enabled) {
         this.enabled = enabled;
     }
+
+    public Set<Address> getAddresses() {
+        return addresses;
+    }
+
+    public void setAddresses(Set<Address> addresses) {
+        this.addresses = addresses;
+    }
+//
+//    public Set<OrderDetails> getOrdersDetails() {
+//        return ordersDetails;
+//    }
+//
+//    public void setOrdersDetails(Set<OrderDetails> ordersDetails) {
+//        this.ordersDetails = ordersDetails;
+//    }
+//
+//    public Cart getCart() {
+//        return cart;
+//    }
+//
+//    public void setCart(Cart cart) {
+//        this.cart = cart;
+//    }
 }

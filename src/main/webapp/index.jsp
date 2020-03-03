@@ -26,9 +26,9 @@
     <a href="${pageContext.request.contextPath}/api/search/count?keyWord=q">Search Count</a><br>
     <hr> <br>
     <hr>
-    <a href="${pageContext.request.contextPath}/user/users">Get All users</a><br>
-    <a href="${pageContext.request.contextPath}/user/user/current">Get Current User</a><br>
-    <a href="${pageContext.request.contextPath}/user/user/1">Get User By ID</a><br>
+    <a href="${pageContext.request.contextPath}/auth/users">Get All users</a><br>
+    <a href="${pageContext.request.contextPath}/auth/user/current">Get Current User</a><br>
+    <a href="${pageContext.request.contextPath}/auth/user/1">Get User By ID</a><br>
     <hr>
 
 </div>
