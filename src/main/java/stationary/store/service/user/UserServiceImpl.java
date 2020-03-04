@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import stationary.store.dao.user.UserDAO;
 import stationary.store.model.User;
+
 import java.util.List;
 
 
@@ -30,7 +31,6 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void saveUser(User theUser) {
-
         userDAO.saveUser(theUser);
     }
 
@@ -45,6 +45,12 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public User getCurrentUser() {
         return userDAO.getCurrentUser();
+    }
+
+    @Override
+    @Transactional
+    public int getLastID() {
+        return userDAO.getLastID();
     }
 
     @Override

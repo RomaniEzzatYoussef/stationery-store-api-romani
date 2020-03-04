@@ -1,9 +1,6 @@
 package stationary.store.config;
 
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
-import stationary.store.config.security.CORSFilter;
-
-import javax.servlet.Filter;
 
 public class MySpringMvcDispatcherServletInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
 
@@ -30,9 +27,3 @@ public class MySpringMvcDispatcherServletInitializer extends AbstractAnnotationC
 
 
 }
-
-
-
-
-
-

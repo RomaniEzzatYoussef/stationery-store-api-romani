@@ -63,11 +63,7 @@ public class UserDAOImpl implements UserDAO {
 
     @Override
     public void saveUser(User theUser) {
-
-        // get current hibernate session
         Session currentSession = sessionFactory.getCurrentSession();
-
-        // save/upate the User ... finally LOL
         currentSession.saveOrUpdate(theUser);
 
     }
@@ -83,6 +79,15 @@ public class UserDAOImpl implements UserDAO {
         }
 
         return user;
+    }
+
+    @Override
+    public int getLastID() {
+
+        Session currentSession = sessionFactory.getCurrentSession();
+        int lastId = (int) currentSession.createQuery("SELECT max(u.id) from User u").getResultList().get(0);
+
+        return lastId;
     }
 
     @Override

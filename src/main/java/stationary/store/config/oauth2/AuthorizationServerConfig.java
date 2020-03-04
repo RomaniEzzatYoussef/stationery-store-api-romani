@@ -32,29 +32,17 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 
     @Override
     public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
-     //   security.allowFormAuthenticationForClients();
-//        security.tokenKeyAccess("hasAuthority('ROLE_TRUSTED_CLIENT')")
-//                .checkTokenAccess("hasAuthority('ROLE_TRUSTED_CLIENT')");
+        security.allowFormAuthenticationForClients();
     }
 
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-        endpoints.tokenStore(tokenStore).authenticationManager(authenticationManager);
-//        endpoints.authenticationManager(authenticationManager).tokenStore(tokenStore).approvalStoreDisabled();
+        endpoints.tokenStore(tokenStore).authenticationManager(authenticationManager).approvalStoreDisabled();
     }
 
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-        clients
-                .inMemory()
-                .withClient("c")
-                .secret("s")
-                .authorizedGrantTypes("client_credentials", "password","authorization_code","refresh_token")
-                .scopes("read", "write", "trust")
-                .authorities("ROLE_CLIENT", "ROLE_TRUSTED_CLIENT")
-                .resourceIds("resource_id")
-                .accessTokenValiditySeconds(5000).
-                refreshTokenValiditySeconds(5000);
+        clients.jdbc(dataSource);
     }
 
     @Bean

@@ -1,15 +1,10 @@
 package stationary.store.rest;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
-import stationary.store.config.security.MyUserDetails;
 import stationary.store.model.*;
+import stationary.store.service.address.AddressService;
 import stationary.store.service.category.CategoryService;
 import stationary.store.service.classifiedProduct.ClassifiedProductService;
 import stationary.store.service.grade.GradeService;
@@ -187,42 +182,44 @@ public class AppRestController {
     @Autowired
     UserDetailsService userDetailsService;
 
+    @Autowired
+    AddressService addressService;
 
-//    @Autowired
-//    AuthenticationManager authenticationManager;
+    @PostMapping("/user")
+    public User registerUser(@RequestBody UserRegister userRegister) throws Exception {
+
+        User user = new User();
+
+        UserType userType = new UserType();
+        userType.setId(3);
+        userType.setUserType("Customer");
+
+        user.setUserType(userType);
+
+        user.setFirstName(userRegister.getFirstName());
+        user.setLastName(userRegister.getLastName());
+        user.setPhoneNumber1(userRegister.getPhoneNumber());
+        user.setPhoneNumber2(userRegister.getPhoneNumber2());
+        user.setEmail(userRegister.getEmail());
+        user.setPassword(userRegister.getPassword());
+        user.setEnabled(1);
 
 
-
-//    @Autowired
-//    JwtUtil JwtUtil;
-//
-//    @PostMapping("/user/u")
-//    public ResponseEntity<?> registerUser(@RequestBody AuthRequest user) throws Exception {
-//        try {
-//            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername() , user.getPassword()));
-//        } catch (BadCredentialsException e) {
-//            throw new Exception("Incorrect username or password" , e);
-//        }
-//
-//        final UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
-//
-//        final String jwt = JwtUtil.generateToken(userDetails);
-//
-//        return ResponseEntity.ok(new AuthResponse(jwt));
-//    }
-//
-//    @PostMapping("/user")
-//    public User registerUser(@RequestBody User user) throws Exception {
-//
 //        UserDetails userDetails = new MyUserDetails(user);
 //        final String jwt = JwtUtil.generateToken(userDetails);
-//
-//        user.setId(0);
+
 //        user.setToken(jwt);
-//        userService.saveUser(user);
-//
-//        return user;
-//    }
+        user.setId(0);
+        userService.saveUser(user);
+
+        for (Address address : userRegister.getAddresses())
+        {
+            address.setUser(user);
+            addressService.saveAddress(address);
+        }
+
+        return userService.getUser(userService.getLastID());
+    }
 
 }
 

@@ -7,14 +7,12 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
-
 import javax.sql.DataSource;
 
 @Configuration
@@ -31,17 +29,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     DataSource dataSource;
 
-    @Override
-    public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers("/oauth/**");
-    }
-
     @Autowired
     public void configureGlobal(final AuthenticationManagerBuilder auth) throws Exception {
-//        auth
-//                .userDetailsService(userDetailsService)
-//                .passwordEncoder(passwordEncoder);
-        auth.inMemoryAuthentication().withUser("r").password("r").roles("ADMIN");
+        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
     }
 
     @Override
@@ -55,42 +45,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .csrf().disable();
     }
-
-//    @Override
-//    public void configure(HttpSecurity httpSecurity) throws Exception {
-//
-//        httpSecurity.httpBasic().disable().csrf().disable()
-//                .antMatcher("/oauth/token").authorizeRequests().anyRequest().permitAll();
-//
-////        httpSecurity
-////                .csrf().disable()
-////                .anonymous().disable()
-////                .authorizeRequests()
-////                .antMatchers("/api-docs/**").permitAll();
-//
-////        httpSecurity.csrf().disable()
-////                .authorizeRequests()
-////                .antMatchers("/auth*/**").authenticated()
-////                .anyRequest().permitAll()
-////                .and().sessionManagement()
-////                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-//
-////        httpSecurity.addFilterBefore(jwtAuthTokenFilter , UsernamePasswordAuthenticationFilter.class);
-//
-////        httpSecurity
-////                .authorizeRequests()
-////                .antMatchers("/oauth/token").permitAll()
-////                .anyRequest().authenticated()
-////                .and()
-////                .httpBasic()
-////                .and()
-////                .csrf().disable();
-//
-//////        httpSecurity.csrf().disable()
-////                .authorizeRequests()
-////                .antMatchers("/user*/**").authenticated()
-////                .anyRequest().permitAll();
-//    }
 
     @Bean
     @Override
