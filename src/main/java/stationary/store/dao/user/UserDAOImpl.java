@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import stationary.store.model.User;
 import stationary.store.utilities.exceptions.NotFoundException;
-
 import java.util.List;
 
 @Repository
@@ -21,17 +20,10 @@ public class UserDAOImpl implements UserDAO {
     @Override
     public List<User> getUsers() {
 
-        // get the current hibernate session
         Session currentSession = sessionFactory.getCurrentSession();
+        Query<User> theQuery = currentSession.createQuery("select u From User u", User.class);
 
-        // create a query  ... sort by last name
-        Query<User> theQuery =
-                currentSession.createQuery("select u From User u", User.class);
-
-        // execute query and get result list
         List<User> Users = theQuery.getResultList();
-
-        // return the results
         return Users;
     }
 
@@ -94,17 +86,17 @@ public class UserDAOImpl implements UserDAO {
     public User getUserByEmail(String email) {
         Session currentSession = sessionFactory.getCurrentSession();
 
-        if (existsByEmail(email)) {
-            Query<User> theQuery = currentSession.createQuery("select u from User u where u.email=:email" , User.class);
-            theQuery.setParameter("email", email);
-            User user =  theQuery.getResultList().get(0);
-            return user;
+        Query<User> query = currentSession.createQuery("select u from User u where u.email =:email" , User.class);
+        query.setParameter("email", email);
+        User user;
+
+        if (query.getResultList().size() == 0) {
+            throw new NotFoundException("user not found with email: " + email);
         } else {
-            User user = new User();
-            user.setEmail("romani");
-            user.setPassword("r");
-            return user;
+            user = query.getResultList().get(0);
         }
+
+        return user;
     }
 
     @Override
@@ -122,23 +114,9 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
-    public User getCurrentUser() {
-        Session currentSession = sessionFactory.getCurrentSession();
-
-        int currentUser = 22;
-        User user = currentSession.get(User.class, currentUser);
-        return user;
-    }
-
-    @Override
     public void deleteUser(int theId) {
-
-        // get the current hibernate session
         Session currentSession = sessionFactory.getCurrentSession();
-
-        // delete object with primary key
-        Query theQuery =
-                currentSession.createQuery("delete from User where id=:userId");
+        Query theQuery = currentSession.createQuery("delete from User where id=:userId");
         theQuery.setParameter("userId", theId);
 
         theQuery.executeUpdate();

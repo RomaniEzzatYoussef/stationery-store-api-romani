@@ -13,6 +13,8 @@ public interface ProductPatchService {
 
     ProductPatch getProductPatch(int theId);
 
+    ProductPatch getProductPatchByProductId(int productId);
+
     void deleteProductPatch(int theId);
 
 }

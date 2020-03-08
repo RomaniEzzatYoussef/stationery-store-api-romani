@@ -24,12 +24,12 @@ public class OrderDetails implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "address_id")
-    @JsonBackReference
+//    @JsonBackReference
     private Address address;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "user_id")
-    @JsonBackReference
+//    @JsonBackReference
     private User user;
 
     public OrderDetails() {

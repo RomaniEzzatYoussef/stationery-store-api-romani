@@ -1,9 +1,7 @@
 package stationary.store.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import javax.persistence.*;
@@ -23,7 +21,7 @@ public class User {
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "user_type_id")
-    @JsonBackReference
+    @JsonIgnoreProperties("users")
     private UserType userType;
 
     @Column(name = "first_name")
@@ -44,26 +42,20 @@ public class User {
     @Column(name = "password")
     private String password;
 
-    @Column(name = "token")
-    private String token;
-
     @Column(name = "enabled")
     private int enabled;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    @JsonManagedReference
     @Fetch(FetchMode.JOIN)
     private Set<Address> addresses;
-//
-//    @OneToMany(mappedBy = "user",
-//            cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
+
+//    @OneToOne(cascade =  CascadeType.ALL)
+//    private Cart cart;
+
+//    @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
 //    @JsonManagedReference
 //    private Set<OrderDetails> ordersDetails;
 
-//    @OneToOne(fetch = FetchType.LAZY,
-//            cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
-//    @JoinColumn(name = "cart_id")
-//    private Cart cart;
 
     public User() {
     }
@@ -132,14 +124,6 @@ public class User {
         this.password = password;
     }
 
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
-
     public int getEnabled() {
         return enabled;
     }
@@ -155,15 +139,7 @@ public class User {
     public void setAddresses(Set<Address> addresses) {
         this.addresses = addresses;
     }
-//
-//    public Set<OrderDetails> getOrdersDetails() {
-//        return ordersDetails;
-//    }
-//
-//    public void setOrdersDetails(Set<OrderDetails> ordersDetails) {
-//        this.ordersDetails = ordersDetails;
-//    }
-//
+
 //    public Cart getCart() {
 //        return cart;
 //    }
@@ -171,4 +147,15 @@ public class User {
 //    public void setCart(Cart cart) {
 //        this.cart = cart;
 //    }
+
+
+//    public Set<OrderDetails> getOrdersDetails() {
+//        return ordersDetails;
+//    }
+//
+//    public void setOrdersDetails(Set<OrderDetails> ordersDetails) {
+//        this.ordersDetails = ordersDetails;
+//    }
+
+
 }

@@ -31,10 +31,8 @@ public class Shipper implements Serializable {
     @Column(name = "status")
     private boolean active;
 
-    @OneToMany(mappedBy = "shipper",
-            cascade = {CascadeType.PERSIST, CascadeType.MERGE,
-                    CascadeType.DETACH, CascadeType.REFRESH})
-    @JsonManagedReference
+    @OneToMany(mappedBy = "shipper", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
+    @JsonIgnoreProperties("shipper")
     private List<Order> orders;
 
     public Shipper() {

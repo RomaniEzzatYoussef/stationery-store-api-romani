@@ -12,6 +12,8 @@ public interface ProductPatchDAO {
 
     ProductPatch getProductPatch(int id);
 
+    ProductPatch getProductPatchByProductId(int productId);
+
     void deleteProductPatch(int id);
 
 }

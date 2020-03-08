@@ -14,8 +14,6 @@ public interface UserService {
 
     User getUser(int theId);
 
-    User getCurrentUser();
-
     int getLastID();
 
     User getUserByEmail(String email);

@@ -10,7 +10,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "order_status")
-@JsonIgnoreProperties(ignoreUnknown = true)
+//@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class OrderStatus implements Serializable {
 
@@ -24,7 +24,6 @@ public class OrderStatus implements Serializable {
 
     @OneToMany(mappedBy = "orderStatus",
             cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
-    @JsonManagedReference
     private List<Order> orders;
 
     public OrderStatus() {

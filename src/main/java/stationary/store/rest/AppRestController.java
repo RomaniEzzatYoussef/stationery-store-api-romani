@@ -2,7 +2,12 @@ package stationary.store.rest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.oauth2.common.OAuth2AccessToken;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
+import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
+import org.springframework.security.oauth2.provider.token.ConsumerTokenServices;
 import org.springframework.web.bind.annotation.*;
+import stationary.store.config.oauth2.AuthorizationServerConfig;
 import stationary.store.model.*;
 import stationary.store.service.address.AddressService;
 import stationary.store.service.category.CategoryService;
@@ -12,7 +17,13 @@ import stationary.store.service.gradeLevel.GradeLevelService;
 import stationary.store.service.offer.OfferService;
 import stationary.store.service.product.ProductService;
 import stationary.store.service.user.UserService;
+import stationary.store.service.userType.UserTypeService;
 import stationary.store.utilities.json.*;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -180,6 +191,9 @@ public class AppRestController {
     UserService userService;
 
     @Autowired
+    UserTypeService userTypeService;
+
+    @Autowired
     UserDetailsService userDetailsService;
 
     @Autowired
@@ -190,11 +204,16 @@ public class AppRestController {
 
         User user = new User();
 
-        UserType userType = new UserType();
-        userType.setId(3);
-        userType.setUserType("Customer");
+        UserType userType;
 
-        user.setUserType(userType);
+        if (userRegister.getAddresses() == null) {
+            userType = userTypeService.getUserType(2);
+            user.setUserType(userType);
+
+        } else {
+            userType = userTypeService.getUserType(3);
+            user.setUserType(userType);
+        }
 
         user.setFirstName(userRegister.getFirstName());
         user.setLastName(userRegister.getLastName());
@@ -204,18 +223,15 @@ public class AppRestController {
         user.setPassword(userRegister.getPassword());
         user.setEnabled(1);
 
-
-//        UserDetails userDetails = new MyUserDetails(user);
-//        final String jwt = JwtUtil.generateToken(userDetails);
-
-//        user.setToken(jwt);
         user.setId(0);
         userService.saveUser(user);
 
-        for (Address address : userRegister.getAddresses())
-        {
-            address.setUser(user);
-            addressService.saveAddress(address);
+        if (userRegister.getAddresses() != null) {
+            for (Address address : userRegister.getAddresses())
+            {
+                address.setUser(user);
+                addressService.saveAddress(address);
+            }
         }
 
         return userService.getUser(userService.getLastID());

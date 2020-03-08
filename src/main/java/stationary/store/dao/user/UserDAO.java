@@ -20,8 +20,6 @@ public interface UserDAO {
 
     boolean existsByEmail(String email);
 
-    User getCurrentUser();
-
     void deleteUser(int id);
 
 }

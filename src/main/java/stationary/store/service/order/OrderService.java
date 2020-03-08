@@ -13,6 +13,8 @@ public interface OrderService {
 
     Order getOrder(int theId);
 
+    int getLastID();
+
     void deleteOrder(int theId);
 
 }

@@ -55,7 +55,6 @@ public class OfferDAOImpl implements OfferDAO {
             throw new NotFoundException("No offers found in page: " + pageNumber);
         }
 
-
         List<OfferJSON> offerJSONS = new ArrayList<>();
 
         for (int i = 0; i < offers.size(); i++) {

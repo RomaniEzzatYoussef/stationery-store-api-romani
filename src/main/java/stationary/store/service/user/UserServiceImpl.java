@@ -43,12 +43,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public User getCurrentUser() {
-        return userDAO.getCurrentUser();
-    }
-
-    @Override
-    @Transactional
     public int getLastID() {
         return userDAO.getLastID();
     }

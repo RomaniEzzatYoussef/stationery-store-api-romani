@@ -24,7 +24,7 @@ public class Offer implements Serializable {
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "product_id")
-    @JsonManagedReference
+    @JsonIgnoreProperties("offers")
     private Product product;
 
     @Column(name = "discount")

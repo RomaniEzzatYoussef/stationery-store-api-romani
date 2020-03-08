@@ -1,9 +1,7 @@
 package stationary.store.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-
 import javax.persistence.*;
 import java.io.Serializable;
 
@@ -19,15 +17,14 @@ public class OrderItem implements Serializable {
     private int id;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
-            CascadeType.DETACH, CascadeType.REFRESH}, fetch = FetchType.LAZY)
+            CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "product_id")
-    @JsonBackReference
+    @JsonIgnoreProperties("orders")
     private Product product;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
             CascadeType.DETACH, CascadeType.REFRESH}, fetch = FetchType.LAZY)
     @JoinColumn(name = "classified_product_id")
-    @JsonBackReference
     private ClassifiedProduct classifiedProduct;
 
     @Column(name = "quantity")
@@ -38,7 +35,6 @@ public class OrderItem implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "order_id")
-    @JsonBackReference
     private Order order;
 
     public OrderItem() {

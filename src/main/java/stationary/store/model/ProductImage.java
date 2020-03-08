@@ -9,7 +9,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "product_images")
-@JsonIgnoreProperties(ignoreUnknown = true)
+//@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class ProductImage implements Serializable {
 

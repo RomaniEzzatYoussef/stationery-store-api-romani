@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import stationary.store.dao.cart.CartDAO;
 import stationary.store.model.Cart;
+import stationary.store.model.CartItem;
+import stationary.store.model.User;
 
 import java.util.List;
 
@@ -24,6 +26,12 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @Transactional
+    public List<CartItem> getCartItemsByUser(int userId, Integer limit , Integer pageNumber) {
+        return cartDAO.getCartItemsByUser(userId , limit , pageNumber);
+    }
+
+    @Override
+    @Transactional
     public void saveCart(Cart theCart) {
 
         cartDAO.saveCart(theCart);
@@ -34,6 +42,12 @@ public class CartServiceImpl implements CartService {
     public Cart getCart(int theId) {
 
         return cartDAO.getCart(theId);
+    }
+
+    @Override
+    @Transactional
+    public int getCartIdByUserId(User user) {
+        return cartDAO.getCartIdByUserId(user);
     }
 
     @Override

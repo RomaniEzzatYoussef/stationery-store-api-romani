@@ -4,7 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import stationary.store.dao.orderDetails.OrderDetailsDAO;
+import stationary.store.model.Address;
 import stationary.store.model.OrderDetails;
+import stationary.store.model.User;
 
 import java.util.List;
 
@@ -34,6 +36,12 @@ public class OrderDetailsServiceImpl implements OrderDetailsService {
     public OrderDetails getOrderDetails(int theId) {
 
         return orderDetailsDAO.getOrderDetails(theId);
+    }
+
+    @Override
+    @Transactional
+    public int getOrderIdByUserId(User user, Address address) {
+        return orderDetailsDAO.getOrderIdByUserId(user, address);
     }
 
     @Override

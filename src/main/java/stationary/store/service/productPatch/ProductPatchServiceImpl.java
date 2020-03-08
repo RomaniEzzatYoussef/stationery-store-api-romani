@@ -38,6 +38,12 @@ public class ProductPatchServiceImpl implements ProductPatchService {
 
     @Override
     @Transactional
+    public ProductPatch getProductPatchByProductId(int productId) {
+        return productPatchDAO.getProductPatchByProductId(productId);
+    }
+
+    @Override
+    @Transactional
     public void deleteProductPatch(int theId) {
 
         productPatchDAO.deleteProductPatch(theId);

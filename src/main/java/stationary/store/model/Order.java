@@ -1,12 +1,13 @@
 package stationary.store.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -21,44 +22,40 @@ public class Order implements Serializable {
     @Column(name = "id")
     private int id;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "order_status_id")
-    @JsonBackReference
+    @JsonIgnoreProperties("orders")
     private OrderStatus orderStatus;
 
     @Column(name = "submit_date")
-    private Date sumbitDate;
+    private String sumbitDate;
 
     @Column(name = "estimated_days")
     private int estDelieveryDays;
 
     @Column(name = "delivery_date")
-    private Date delieveryDate;
+    private String delieveryDate;
 
     @Column(name = "last_status_update_date")
-    private Date lastUpdateDate;
+    private String lastUpdateDate;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-    @JsonManagedReference
+    @JsonIgnoreProperties("order")
+    @Fetch(FetchMode.JOIN)
     private List<OrderItem> orderItems;
 
-    @ManyToOne(fetch = FetchType.LAZY,
-            cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "shipper_id")
-    @JsonBackReference
+    @JsonIgnoreProperties("orders")
     private Shipper shipper;
 
 
     public Order() {
-
-    }
-
-    public Date getSumbitDate() {
-        return sumbitDate;
-    }
-
-    public void setSumbitDate(Date sumbitDate) {
-        this.sumbitDate = sumbitDate;
+        SimpleDateFormat formatter = new SimpleDateFormat("YYYY-MM-dd");
+        sumbitDate = formatter.format(new Date());
+        delieveryDate = formatter.format(new Date());
+        lastUpdateDate = formatter.format(new Date());
+        estDelieveryDays = 10;
     }
 
     public int getEstDelieveryDays() {
@@ -69,21 +66,6 @@ public class Order implements Serializable {
         this.estDelieveryDays = estDelieveryDays;
     }
 
-    public Date getDelieveryDate() {
-        return delieveryDate;
-    }
-
-    public void setDelieveryDate(Date delieveryDate) {
-        this.delieveryDate = delieveryDate;
-    }
-
-    public Date getLastUpdateDate() {
-        return lastUpdateDate;
-    }
-
-    public void setLastUpdateDate(Date lastUpdateDate) {
-        this.lastUpdateDate = lastUpdateDate;
-    }
 
     public OrderStatus getOrderStatus() {
         return orderStatus;
@@ -109,6 +91,29 @@ public class Order implements Serializable {
         this.orderItems = orderItems;
     }
 
+    public String getSumbitDate() {
+        return sumbitDate;
+    }
+
+    public void setSumbitDate(String sumbitDate) {
+        this.sumbitDate = sumbitDate;
+    }
+
+    public String getDelieveryDate() {
+        return delieveryDate;
+    }
+
+    public void setDelieveryDate(String delieveryDate) {
+        this.delieveryDate = delieveryDate;
+    }
+
+    public String getLastUpdateDate() {
+        return lastUpdateDate;
+    }
+
+    public void setLastUpdateDate(String lastUpdateDate) {
+        this.lastUpdateDate = lastUpdateDate;
+    }
 
     public Shipper getShipper() {
         return shipper;

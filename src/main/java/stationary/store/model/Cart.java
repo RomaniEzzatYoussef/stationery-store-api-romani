@@ -1,17 +1,14 @@
 package stationary.store.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-
 import javax.persistence.*;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 @Entity
 @Table(name = "cart")
-@JsonIgnoreProperties(ignoreUnknown = true)
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class Cart implements Serializable {
 
     @Id
@@ -19,13 +16,20 @@ public class Cart implements Serializable {
     @Column(name = "id")
     private int cartId;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "cart_id")
-    @JsonManagedReference
+    @JsonIgnoreProperties("cart")
     private List<CartItem> cartItems;
 
-    public Cart() {
+    @Column(name = "last_update")
+    private String lastUpdate;
 
+    @OneToOne(cascade =  CascadeType.ALL)
+    private User user;
+
+    public Cart() {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-mm-dd");
+        lastUpdate = formatter.format(new Date(System.currentTimeMillis()));
     }
 
     public int getCartId() {
@@ -42,5 +46,21 @@ public class Cart implements Serializable {
 
     public void setCartItems(List<CartItem> cartItems) {
         this.cartItems = cartItems;
+    }
+
+    public String getLastUpdate() {
+        return lastUpdate;
+    }
+
+    public void setLastUpdate(String lastUpdate) {
+        this.lastUpdate = lastUpdate;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

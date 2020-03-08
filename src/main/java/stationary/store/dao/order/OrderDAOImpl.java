@@ -5,64 +5,64 @@ import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import stationary.store.model.Cart;
 import stationary.store.model.Order;
+import stationary.store.model.OrderDetails;
+import stationary.store.model.User;
+import stationary.store.utilities.exceptions.NotFoundException;
 
 import java.util.List;
 
 @Repository
 public class OrderDAOImpl implements OrderDAO {
 
-    // need to inject the session factory
     @Autowired
     private SessionFactory sessionFactory;
 
     @Override
     public List<Order> getOrders() {
-
-        // get the current hibernate session
         Session currentSession = sessionFactory.getCurrentSession();
 
-        // create a query  ... sort by last name
-        Query<Order> theQuery =
-                currentSession.createQuery("From Order", Order.class);
+        Query<Order> theQuery = currentSession.createQuery("select o From Order o", Order.class);
 
-        // execute query and get result list
         List<Order> Orders = theQuery.getResultList();
 
-        // return the results
         return Orders;
     }
 
     @Override
     public void saveOrder(Order theOrder) {
-
-        // get current hibernate session
         Session currentSession = sessionFactory.getCurrentSession();
 
-        // save/upate the Order ... finally LOL
         currentSession.saveOrUpdate(theOrder);
 
     }
 
     @Override
-    public Order getOrder(int theId) {
+    public int getLastID() {
 
-        // get the current hibernate session
         Session currentSession = sessionFactory.getCurrentSession();
+        int lastId = (int) currentSession.createQuery("SELECT max(o.id) from Order o").getResultList().get(0);
 
-        // now retrieve/read from database using the primary key
-        Order theOrder = currentSession.get(Order.class, theId);
+        return lastId;
+    }
 
-        return theOrder;
+    @Override
+    public Order getOrder(int theId) {
+        Session currentSession = sessionFactory.getCurrentSession();
+        Order order = currentSession.get(Order.class, theId);
+
+        if (order == null) {
+            throw new NotFoundException("Order not found with id : " + theId);
+        }
+
+        return order;
     }
 
     @Override
     public void deleteOrder(int theId) {
-
-        // get the current hibernate session
         Session currentSession = sessionFactory.getCurrentSession();
 
-        // delete object with primary key
         Query theQuery =
                 currentSession.createQuery("delete from Order where id=:orderId");
         theQuery.setParameter("orderId", theId);

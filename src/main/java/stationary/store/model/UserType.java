@@ -2,7 +2,6 @@ package stationary.store.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Set;
@@ -23,7 +22,6 @@ public class UserType implements Serializable {
 
     @OneToMany(mappedBy = "userType",
             cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
-    @JsonManagedReference
     private Set<User> users;
 
     public UserType() {

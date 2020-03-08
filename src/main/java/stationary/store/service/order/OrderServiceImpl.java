@@ -38,6 +38,12 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
+    public int getLastID() {
+        return orderDAO.getLastID();
+    }
+
+    @Override
+    @Transactional
     public void deleteOrder(int theId) {
 
         orderDAO.deleteOrder(theId);

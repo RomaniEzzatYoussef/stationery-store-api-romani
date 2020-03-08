@@ -4,15 +4,12 @@ import com.fasterxml.jackson.annotation.*;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.Where;
-import stationary.store.utilities.myUtils.Utils;
-
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.*;
 
 @Entity
 @Table(name = "product")
-@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class Product implements Serializable {
 
@@ -20,7 +17,6 @@ public class Product implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private int productId;
-
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
@@ -35,40 +31,32 @@ public class Product implements Serializable {
     @Column(name = "min_stock")
     private int minStock;
 
-
-    @OneToMany(mappedBy = "product",
-            cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
-    @JsonManagedReference
+    @OneToMany(mappedBy = "product", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
     private Set<OrderItem> orders;
 
-    @OneToMany(
-            cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "product_id")
-    @JsonManagedReference
     @Fetch(FetchMode.JOIN)
     private Set<ProductImage> imageUrl;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "product", cascade = CascadeType.ALL)
-    @JsonManagedReference
     private Set<CartItem> cartItems;
 
-
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "product")
-    @JsonBackReference
+    @JsonIgnoreProperties(value = {"product" , "user"})
+    @Fetch(FetchMode.JOIN)
     @OrderBy("dateIn")
     @Where(clause = "quantity > 0")
     private Set<ProductPatch> patches;
 
-
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-    @JsonBackReference
+    @JsonIgnoreProperties("product")
+    @Fetch(FetchMode.JOIN)
     @OrderBy("endDate desc")
     @Where(clause = "end_date > sysdate()")
     private Set<Offer> offers;
 
-    @OneToMany(mappedBy = "product",
-            cascade = CascadeType.ALL)
-    @JsonManagedReference
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private Set<ClassifiedProduct> packages;
 
     public Product() {

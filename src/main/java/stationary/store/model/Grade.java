@@ -11,7 +11,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "grade")
-@JsonIgnoreProperties(ignoreUnknown = true)
+//@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class Grade implements Serializable {
 
@@ -22,13 +22,13 @@ public class Grade implements Serializable {
 
     @OneToMany(mappedBy = "grade",
             cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
-    @JsonManagedReference
+//    @JsonManagedReference
     private List<ClassifiedProduct> classifiedProducts;
 
     @ManyToOne(fetch = FetchType.LAZY,
             cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "grade_level")
-    @JsonBackReference
+//    @JsonBackReference
     private GradeLevel gradeLevel;
 
     @Column(name = "grade_number")

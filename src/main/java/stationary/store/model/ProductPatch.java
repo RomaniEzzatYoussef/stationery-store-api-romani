@@ -11,7 +11,7 @@ import java.sql.Date;
 
 @Entity
 @Table(name = "product_patch")
-@JsonIgnoreProperties(ignoreUnknown = true)
+//@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class ProductPatch implements Serializable {
 
@@ -28,7 +28,6 @@ public class ProductPatch implements Serializable {
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
             CascadeType.DETACH, CascadeType.REFRESH}, fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
-    @JsonManagedReference
     private Product product;
 
     @Column(name = "quantity")

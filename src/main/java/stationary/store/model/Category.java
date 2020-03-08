@@ -10,7 +10,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "category")
-@JsonIgnoreProperties(ignoreUnknown = true)
+//@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class Category implements Serializable {
 
@@ -30,7 +30,6 @@ public class Category implements Serializable {
 
     @OneToMany(mappedBy = "category",
             cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
-    @JsonManagedReference
     private List<Product> products;
 
     public Category() {
