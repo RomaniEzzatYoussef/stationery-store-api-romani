@@ -200,7 +200,7 @@ public class UserRestController {
     @PostMapping("/logout")
     public String logout(@RequestParam(name = "access_token") String accessToken) {
         consumerTokenServices.revokeToken(accessToken);
-        return "/";
+        return "logout";
     }
 
 
